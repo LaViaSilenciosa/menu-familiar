@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#1A4A2E"/>
+  <circle cx="256" cy="230" r="110" fill="none" stroke="#C8A86A" stroke-width="18"/>
+  <line x1="256" y1="120" x2="256" y2="340" stroke="#C8A86A" stroke-width="18" stroke-linecap="round"/>
+  <line x1="146" y1="230" x2="366" y2="230" stroke="#C8A86A" stroke-width="18" stroke-linecap="round"/>
+  <text x="256" y="430" font-family="Georgia,serif" font-size="72" font-weight="bold" fill="#F5EDD8" text-anchor="middle">MF</text>
+</svg>

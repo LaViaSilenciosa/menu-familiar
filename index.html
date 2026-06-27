@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Mesa Familiar · Menú de Verano</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1A4A2E" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Menú Familiar" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green-dark: #1A4A2E;
+      --green-mid:  #2D7A4F;
+      --cream:      #FDFAF5;
+      --cream2:     #F5EDD8;
+      --gold:       #C8A86A;
+      --brown:      #6B5A3A;
+      --text:       #2C2410;
+      --text2:      #3A2E1A;
+      --muted:      #9A8A6A;
+      --lunes:      #4A7C59;
+      --martes:     #2E6B8A;
+      --miercoles:  #7B4F2E;
+      --jueves:     #5E4A7C;
+      --viernes:    #8A5C2E;
+      --sabado:     #7C2E4A;
+    }
+    body { font-family: Georgia, serif; background: var(--cream); color: var(--text); min-height: 100dvh; }
+    button { font-family: inherit; border: none; background: none; cursor: pointer; }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+      padding: max(env(safe-area-inset-top), 28px) 20px 22px;
+      text-align: center; color: var(--cream2);
+    }
+    .header-eyebrow { font-family: sans-serif; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; opacity: .7; margin-bottom: 6px; }
+    .header h1 { font-size: clamp(20px, 6vw, 30px); font-weight: 700; letter-spacing: -.5px; }
+    .header-sub { font-family: sans-serif; font-size: 12px; opacity: .6; margin-top: 5px; }
+    .header-hint { font-family: sans-serif; font-size: 11px; opacity: .5; margin-top: 4px; }
+
+    /* ── WEEK TABS ── */
+    .week-tabs { display: flex; gap: 4px; padding: 14px 14px 0; overflow-x: auto; background: var(--cream2); border-bottom: 1px solid #DDD0B8; scrollbar-width: none; }
+    .week-tabs::-webkit-scrollbar { display: none; }
+    .week-tab {
+      flex-shrink: 0; padding: 7px 14px; border-radius: 6px 6px 0 0;
+      font-family: sans-serif; font-size: 12px; font-weight: 600;
+      color: var(--brown); transition: background .2s, color .2s;
+    }
+    .week-tab.active { background: var(--green-dark); color: var(--cream2); }
+
+    /* ── GRID ── */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; padding: 14px; }
+    .day-card {
+      background: #fff; border: 2px solid transparent; border-radius: 12px;
+      padding: 14px 12px; text-align: left; transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .day-card:active { transform: scale(.98); }
+    .day-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-family: sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: #fff; margin-bottom: 10px;
+    }
+    .card-label { font-family: sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; margin-top: 8px; }
+    .card-label:first-of-type { margin-top: 0; }
+    .card-dish { font-size: 12px; color: var(--text2); line-height: 1.4; }
+    .card-arrow { font-family: sans-serif; font-size: 10px; text-align: right; margin-top: 10px; }
+
+    /* ── DETAIL ── */
+    .detail { padding: 14px; max-width: 600px; margin: 0 auto; }
+    .back-btn {
+      border: 1px solid #C8B89A; border-radius: 6px; padding: 6px 12px;
+      font-family: sans-serif; font-size: 12px; color: var(--brown); margin-bottom: 16px;
+    }
+    .day-title-badge {
+      display: inline-block; padding: 4px 14px; border-radius: 20px;
+      font-family: sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #fff; margin-bottom: 10px;
+    }
+    .detail-hint { font-family: sans-serif; font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+    .meal-block { border-radius: 14px; padding: 18px; margin-bottom: 14px; }
+    .meal-block-label { font-family: sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--brown); margin-bottom: 14px; }
+    .dish-btn {
+      display: flex; gap: 10px; align-items: flex-start;
+      width: 100%; text-align: left; background: #fff;
+      border: 1px solid rgba(0,0,0,.07); border-radius: 10px;
+      padding: 10px 12px; margin-bottom: 8px; transition: border-color .15s, background .15s;
+    }
+    .dish-btn:active { background: #FFFDF7; border-color: var(--gold); }
+    .dish-emoji { font-size: 18px; line-height: 1; flex-shrink: 0; }
+    .dish-info { flex: 1; }
+    .dish-role { font-family: sans-serif; font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+    .dish-name { font-size: 14px; color: var(--text); line-height: 1.4; }
+    .dish-icon { font-size: 12px; color: var(--gold); align-self: center; flex-shrink: 0; }
+    .day-nav { display: flex; gap: 8px; margin-top: 6px; }
+    .day-nav-btn { flex: 1; padding: 10px; background: #fff; border: 1px solid #DDD0B8; border-radius: 8px; font-family: sans-serif; font-size: 12px; color: var(--brown); }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(20,14,6,.65);
+      z-index: 1000; display: flex; align-items: flex-end; justify-content: center;
+      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    }
+    .modal-sheet {
+      background: var(--cream); border-radius: 20px 20px 0 0;
+      width: 100%; max-width: 640px;
+      max-height: 88dvh; overflow-y: auto;
+      padding: 0 20px max(env(safe-area-inset-bottom), 32px);
+      box-shadow: 0 -8px 40px rgba(0,0,0,.25);
+    }
+    .modal-handle-wrap { position: sticky; top: 0; background: var(--cream); padding: 14px 0 4px; }
+    .modal-handle { width: 40px; height: 4px; background: #DDD0B8; border-radius: 4px; margin: 0 auto; }
+    .modal-eyebrow { font-family: sans-serif; font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin: 12px 0 5px; }
+    .modal-title { font-size: 19px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 18px; }
+    .modal-time { display: inline-flex; align-items: center; gap: 5px; background: #F0F8EC; border-radius: 20px; padding: 5px 14px; font-family: sans-serif; font-size: 12px; color: #4A7C59; font-weight: 600; margin-bottom: 18px; }
+    .section-label { font-family: sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--brown); text-transform: uppercase; margin-bottom: 10px; }
+    .ingredient-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+    .ingredient-item { display: flex; align-items: baseline; gap: 8px; font-size: 14px; color: var(--text2); line-height: 1.4; }
+    .ingredient-dot { color: var(--gold); font-size: 16px; flex-shrink: 0; }
+    .steps-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .step-item { display: flex; gap: 12px; align-items: flex-start; }
+    .step-num {
+      flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+      background: var(--green-dark); color: var(--cream2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: sans-serif; font-size: 11px; font-weight: 700;
+    }
+    .step-text { font-size: 14px; color: var(--text2); line-height: 1.6; }
+    .tip-box { background: #FDF6E8; border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; padding: 12px 14px; margin-bottom: 20px; }
+    .tip-label { font-family: sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #9A7A3A; text-transform: uppercase; margin-bottom: 4px; }
+    .tip-text { font-size: 13px; color: #5A4A2A; line-height: 1.5; }
+    .modal-close { width: 100%; padding: 13px; background: var(--green-dark); color: var(--cream2); border-radius: 10px; font-family: sans-serif; font-size: 14px; font-weight: 600; }
+    .loading-box { text-align: center; padding: 50px 0; font-family: sans-serif; color: var(--muted); }
+    .loading-emoji { font-size: 30px; margin-bottom: 10px; }
+
+    /* ── FOOTER ── */
+    .footer { text-align: center; padding: 22px 16px; font-family: sans-serif; font-size: 10px; color: #B0A080; border-top: 1px solid #E8DEC8; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  DATOS: MENÚ + RECETAS
+// ═══════════════════════════════════════════════════════
+const RECETAS = {
+  "Gazpacho andaluz con tropezones": {
+    tiempo: "15 min + 1h frío",
+    ingredientes: ["1 kg de tomates maduros", "1 pepino mediano", "1 pimiento verde", "1 diente de ajo", "80 ml de aceite de oliva virgen extra", "30 ml de vinagre de jerez", "Sal al gusto"],
+    pasos: [
+      "Lava y trocea los tomates, el pepino pelado, el pimiento y el ajo. Reserva un poco de cada uno picado fino para los tropezones.",
+      "Tritura todo junto con el aceite, el vinagre y sal. Añade agua fría hasta conseguir la textura deseada.",
+      "Pasa por el chino o colador fino para eliminar pieles y pepitas.",
+      "Rectifica de sal y vinagre. Mete en la nevera mínimo 1 hora.",
+      "Sirve muy frío con los tropezones de verdura picada por encima y un chorrito de aceite."
+    ],
+    consejo: "Si los tomates no están muy maduros, añade un tomate pera de bote al natural para potenciar el sabor."
+  },
+  "Merluza al horno con patatas panaderas": {
+    tiempo: "50 min",
+    ingredientes: ["800g de merluza en rodajas o lomos", "600g de patatas", "2 cebollas", "3 dientes de ajo", "Pimiento rojo y verde (1 de cada)", "100 ml de vino blanco", "Aceite, sal, perejil"],
+    pasos: [
+      "Pela y corta las patatas en rodajas finas. Haz lo mismo con las cebollas y los pimientos.",
+      "Sofríe a fuego lento la cebolla y los pimientos en abundante aceite durante 15 minutos. Añade las patatas y cocina 10 minutos más.",
+      "Coloca las patatas y verduras como base en una fuente de horno. Coloca la merluza encima, salpimenta.",
+      "Vierte el vino blanco, espolvorea ajo picado y perejil. Riega con un chorrito de aceite.",
+      "Hornea a 200°C durante 20-25 minutos hasta que el pescado esté hecho y las patatas tiernas."
+    ],
+    consejo: "Si usas lomos sin espinas es ideal para el niño. Pide en la pescadería que te los preparen así."
+  },
+  "Ensalada de tomate y pepino con orégano": {
+    tiempo: "10 min",
+    ingredientes: ["4 tomates de rama maduros", "1 pepino", "1/2 cebolla morada", "Orégano seco", "Aceite de oliva virgen extra", "Sal y vinagre de manzana"],
+    pasos: [
+      "Lava los tomates y córtalos en rodajas o gajos según prefieras.",
+      "Pela el pepino, córtalo por la mitad a lo largo y luego en medias lunas.",
+      "Pela la cebolla y córtala en juliana muy fina. Si es muy fuerte, remójala 10 min en agua fría.",
+      "Mezcla todo en una fuente. Aliña con sal, vinagre, aceite generoso y orégano al gusto."
+    ],
+    consejo: "Déjala reposar 10 minutos antes de servir para que los tomates suelten su jugo y se mezcle con el aliño."
+  },
+  "Tortilla española con pimientos asados": {
+    tiempo: "35 min",
+    ingredientes: ["6 huevos", "600g de patatas", "1 cebolla", "2 pimientos rojos asados (del tarro o caseros)", "Aceite de oliva", "Sal"],
+    pasos: [
+      "Pela y corta las patatas en láminas finas. Pica la cebolla. Fríe todo junto en abundante aceite a fuego medio-bajo 20 min hasta que estén tiernas. Escurre el aceite.",
+      "Bate los huevos con sal. Añade las patatas y cebolla escurridas. Mezcla y deja reposar 5 min.",
+      "Calienta un poco de aceite en la sartén. Vierte la mezcla y cuaja a fuego medio-bajo con tapa.",
+      "Cuando los bordes estén cuajados, da la vuelta con un plato y termina de cuajar por el otro lado 2-3 min.",
+      "Sirve con los pimientos asados cortados en tiras por encima."
+    ],
+    consejo: "La clave de una buena tortilla es paciencia: fuego bajo y sin prisas. Que quede jugosa por dentro."
+  },
+  "Crema fría de pepino y menta": {
+    tiempo: "15 min + 1h frío",
+    ingredientes: ["3 pepinos grandes", "300g de yogur griego", "1 diente de ajo pequeño", "Hojas de menta fresca", "Zumo de 1 limón", "Aceite de oliva, sal"],
+    pasos: [
+      "Pela los pepinos, reserva unos trozos para decorar y trocea el resto.",
+      "Tritura los pepinos con el yogur, el ajo, el zumo de limón, menta al gusto y sal.",
+      "Añade un chorrito de aceite y vuelve a triturar. Ajusta de sal y limón.",
+      "Refrigera al menos 1 hora. Sirve con pepino picado, hojas de menta y aceite por encima."
+    ],
+    consejo: "Si queda muy espesa añade un poco de agua fría. Si es muy intensa de ajo, retíralo antes de triturar y pon solo medio."
+  },
+  "Pollo a la plancha con judías verdes salteadas": {
+    tiempo: "25 min",
+    ingredientes: ["4 pechugas o contramuslos de pollo", "500g de judías verdes frescas", "3 dientes de ajo", "Zumo de 1 limón", "Aceite de oliva, sal, pimienta, pimentón"],
+    pasos: [
+      "Salpimienta el pollo y marina 10 min con zumo de limón, ajo machacado y pimentón.",
+      "Cuece las judías verdes en agua con sal 8-10 minutos. Escurre y reserva.",
+      "Cocina el pollo en la plancha caliente con un poco de aceite, 5-6 min por cada lado según el grosor.",
+      "En la misma sartén, saltea las judías con ajo laminado 3-4 minutos. Salpimenta."
+    ],
+    consejo: "Para que el pollo quede jugoso, no lo aplastes contra la plancha y déjalo reposar 2 minutos antes de servir."
+  },
+  "Pisto manchego": {
+    tiempo: "40 min",
+    ingredientes: ["2 calabacines", "1 berenjena", "2 pimientos (1 rojo, 1 verde)", "4 tomates maduros", "1 cebolla", "3 dientes de ajo", "Aceite de oliva, sal, azúcar"],
+    pasos: [
+      "Corta todas las verduras en dados pequeños y uniformes.",
+      "Sofríe la cebolla y el ajo en aceite a fuego medio 5 minutos. Añade los pimientos y cocina 5 min más.",
+      "Incorpora la berenjena y el calabacín. Cocina 10 minutos removiendo de vez en cuando.",
+      "Añade el tomate rallado o triturado. Pon una pizca de azúcar para corregir la acidez. Salpimenta.",
+      "Cocina a fuego lento 20 minutos hasta que todo esté tierno y el líquido reducido."
+    ],
+    consejo: "Está mejor de un día para otro. Puedes hacer doble cantidad y usarlo el día siguiente con huevo, en pasta o como guarnición."
+  },
+  "Huevos revueltos con champiñones": {
+    tiempo: "15 min",
+    ingredientes: ["6 huevos", "400g de champiñones frescos", "2 dientes de ajo", "Perejil fresco", "Aceite de oliva, sal, pimienta"],
+    pasos: [
+      "Limpia los champiñones y córtalos en láminas. Pica el ajo y el perejil.",
+      "Saltea los champiñones con el ajo en aceite a fuego vivo hasta que suelten el agua y se doren. Salpimenta.",
+      "Bate los huevos ligeramente con sal. Baja el fuego al mínimo.",
+      "Añade los huevos a los champiñones y remueve con cuchara de madera sin parar hasta que cuajen cremosos.",
+      "Retira del fuego antes de que estén del todo cuajados (el calor residual termina la cocción). Espolvorea perejil."
+    ],
+    consejo: "El secreto de los revueltos cremosos es fuego muy bajo y no dejar de mover. Retirarlos antes de que parezcan hechos del todo."
+  },
+  "Ensaladilla rusa casera": {
+    tiempo: "40 min",
+    ingredientes: ["500g de patatas", "3 zanahorias", "200g de guisantes frescos o congelados", "4 huevos", "200g de atún en aceite", "250g de mayonesa casera o de calidad"],
+    pasos: [
+      "Cuece las patatas y las zanahorias con piel en agua con sal hasta que estén tiernas (20-25 min). Cuece también los huevos 10 min.",
+      "Deja enfriar todo. Pela y corta las patatas y zanahorias en dados pequeños. Pica los huevos.",
+      "Cuece los guisantes 5 minutos si son frescos. Escúrrelos.",
+      "Mezcla patatas, zanahorias, guisantes, huevo picado y atún escurrido.",
+      "Añade la mayonesa, mezcla con cuidado y refrigera al menos 1 hora antes de servir."
+    ],
+    consejo: "Cuece las patatas enteras y con piel: absorben menos agua y quedan más sabrosas. Pela en caliente con cuidado."
+  },
+  "Solomillo de cerdo a la plancha con escalivada": {
+    tiempo: "45 min",
+    ingredientes: ["600g de solomillo de cerdo", "2 pimientos rojos", "1 berenjena grande", "1 cebolla grande", "Aceite de oliva, sal, ajo, perejil"],
+    pasos: [
+      "Para la escalivada: asa los pimientos, la berenjena y la cebolla enteros en el horno a 200°C durante 35-40 min, dándoles la vuelta a mitad.",
+      "Mete las verduras asadas en una bolsa de plástico 10 min (el vapor facilita pelarlas). Pélalas y córtalas en tiras.",
+      "Aliña la escalivada con aceite, sal y ajo picado. Reserva.",
+      "Corta el solomillo en medallones de 2 cm. Salpimienta y cocina en plancha muy caliente 2-3 min por lado.",
+      "Sirve los medallones sobre la escalivada con perejil picado."
+    ],
+    consejo: "La escalivada está mejor templada o a temperatura ambiente, nunca fría de nevera. Puedes prepararla la víspera."
+  },
+  "Caldo de verduras ligero": {
+    tiempo: "45 min",
+    ingredientes: ["2 zanahorias", "2 ramas de apio", "1 puerro", "1 cebolla", "1 tomate maduro", "Perejil, laurel, sal"],
+    pasos: [
+      "Lava y trocea todas las verduras en piezas grandes.",
+      "Pon todo en una olla con 2 litros de agua fría. Añade las hierbas y sal.",
+      "Lleva a ebullición, baja el fuego y cocina a fuego lento 40 minutos.",
+      "Cuela el caldo. Sirve caliente con un chorrito de aceite de oliva crudo."
+    ],
+    consejo: "Congela el caldo en porciones individuales para tener siempre a mano. Aguanta 3-4 días en nevera."
+  },
+  "Bonito encebollado con tomate": {
+    tiempo: "35 min",
+    ingredientes: ["600g de bonito fresco en rodajas", "3 cebollas grandes", "4 tomates maduros", "2 dientes de ajo", "Aceite de oliva, sal, pimentón dulce, laurel"],
+    pasos: [
+      "Pica las cebollas en juliana fina. Sofríe a fuego bajo en aceite con laurel durante 20 minutos hasta que estén muy tiernas y doradas.",
+      "Añade el ajo picado y el tomate rallado. Cocina 10 minutos más. Salpimenta y añade una pizca de pimentón.",
+      "Salpimienta el bonito. En otra sartén con un poco de aceite, marca 1 minuto por lado.",
+      "Añade el bonito a la salsa de cebolla y tomate. Cocina 5 minutos a fuego suave."
+    ],
+    consejo: "No pases demasiado el bonito: en el centro debe quedar ligeramente rosado para que no quede seco."
+  },
+  "Salmorejo cordobés con jamón y huevo duro": {
+    tiempo: "20 min + 1h frío",
+    ingredientes: ["1 kg de tomates maduros", "200g de pan del día anterior", "1 diente de ajo", "100 ml de aceite de oliva virgen extra", "2 cucharadas de vinagre de jerez", "Sal, jamón serrano y 2 huevos duros para decorar"],
+    pasos: [
+      "Remoja el pan en agua 5 minutos. Escurre bien apretando con las manos.",
+      "Tritura los tomates con el pan, el ajo, el vinagre y la sal hasta obtener una crema fina.",
+      "Sin parar la batidora, añade el aceite poco a poco en hilo fino para emulsionar. Debe quedar espeso y brillante.",
+      "Pasa por el chino si lo quieres más fino. Refrigera al menos 1 hora.",
+      "Sirve con jamón picado fino y huevo duro rallado por encima."
+    ],
+    consejo: "La calidad del tomate es fundamental. Usa tomates de rama muy maduros o tomates de colgar. En invierno añade un tomate en conserva."
+  },
+  "Lentejas estofadas con verduras de verano": {
+    tiempo: "50 min",
+    ingredientes: ["400g de lentejas pardinas", "1 cebolla, 2 zanahorias, 1 pimiento verde", "3 dientes de ajo", "2 tomates maduros", "Pimentón dulce, comino, laurel, aceite, sal"],
+    pasos: [
+      "Enjuaga las lentejas. En una olla, sofríe la cebolla, el pimiento y el ajo picados en aceite 8 minutos.",
+      "Añade el tomate rallado y cocina 5 min. Incorpora las zanahorias en dados, el pimentón y el comino.",
+      "Añade las lentejas y el laurel. Cubre con agua o caldo y lleva a ebullición.",
+      "Cocina a fuego medio-bajo 30-35 minutos hasta que las lentejas estén tiernas. Ajusta de agua si es necesario.",
+      "Salpimenta al final. Sirve con un chorrito de aceite crudo."
+    ],
+    consejo: "La sal siempre al final de la cocción, si la añades antes las lentejas pueden quedar duras."
+  },
+  "Ensalada mixta con atún y maíz": {
+    tiempo: "10 min",
+    ingredientes: ["1 lechuga romana o iceberg", "2 tomates", "1 pepino", "200g de atún en aceite de oliva", "100g de maíz dulce", "Aceitunas, aceite, vinagre, sal"],
+    pasos: [
+      "Lava y seca bien la lechuga. Córtala en trozos.",
+      "Trocea los tomates y el pepino. Escurre el atún y el maíz.",
+      "Mezcla todo en una ensaladera. Añade las aceitunas.",
+      "Aliña con sal, vinagre y aceite generoso justo antes de servir."
+    ],
+    consejo: "Aliña siempre en el último momento para que la lechuga no se ablande."
+  },
+  "Pizza casera de verduras": {
+    tiempo: "30 min + 1h reposo masa",
+    ingredientes: ["Para la masa: 300g de harina, 7g de levadura seca, 180ml de agua tibia, sal, aceite", "Tomate frito casero", "Mozarela fresca", "Verduras al gusto: pimiento, calabacín, cebolla, champiñones"],
+    pasos: [
+      "Mezcla la harina con la levadura y una pizca de sal. Añade el agua tibia y 2 cucharadas de aceite. Amasa 10 minutos hasta obtener una masa lisa. Deja reposar tapada 1 hora.",
+      "Estira la masa en la bandeja del horno con un poco de aceite. Deja los bordes un poco más gruesos.",
+      "Unta tomate frito por encima. Distribuye las verduras cortadas finas y la mozarela en trozos.",
+      "Hornea a 240°C (máxima potencia) 12-15 minutos hasta que los bordes estén dorados."
+    ],
+    consejo: "Precalienta el horno al máximo al menos 20 minutos antes. El calor intenso es la clave de una pizza crujiente."
+  },
+  "Vichyssoise fría": {
+    tiempo: "30 min + 2h frío",
+    ingredientes: ["4 puerros (la parte blanca)", "3 patatas medianas", "1 cebolla", "700ml de caldo de verduras", "200ml de nata líquida", "Aceite, sal, cebollino"],
+    pasos: [
+      "Limpia bien los puerros y córtalos en rodajas. Pela y trocea las patatas y la cebolla.",
+      "Sofríe la cebolla y los puerros en aceite a fuego suave 10 minutos sin que cojan color.",
+      "Añade las patatas y el caldo. Cocina 20 minutos hasta que las patatas estén tiernas.",
+      "Tritura muy bien con la batidora. Añade la nata, sal al gusto y vuelve a triturar.",
+      "Cuela para obtener una crema muy fina. Refrigera mínimo 2 horas. Sirve con cebollino picado."
+    ],
+    consejo: "Debe servirse muy fría. Si está demasiado espesa al enfriar, añade un poco de leche fría y remueve bien."
+  },
+  "Dorada a la sal con ensalada verde": {
+    tiempo: "40 min",
+    ingredientes: ["2 doradas de unos 500g cada una (limpias)", "2 kg de sal gorda", "2 claras de huevo", "Lechuga, pepino, rábanos para la ensalada", "Aceite de oliva, limón, sal fina"],
+    pasos: [
+      "Mezcla la sal gorda con las claras de huevo hasta que parezca arena mojada.",
+      "Pon una capa de sal de 1 cm en la fuente. Coloca las doradas encima y cúbrelas completamente con el resto de la sal.",
+      "Hornea a 200°C durante 25-30 minutos. La sal debe quedar dura como una costra.",
+      "Rompe la costra en la mesa. Retira la sal con cuidado, la piel sale con ella. Sirve los lomos limpios.",
+      "Acompaña con ensalada verde aliñada con aceite y limón."
+    ],
+    consejo: "Pide en la pescadería que te las limpien pero que dejen las escamas: protegen la carne durante la cocción."
+  },
+  "Gazpacho de remolacha": {
+    tiempo: "15 min + 1h frío",
+    ingredientes: ["300g de remolacha cocida", "400g de tomates maduros", "1/2 pepino", "1 diente de ajo", "50 ml de aceite de oliva", "2 cucharadas de vinagre de jerez, sal"],
+    pasos: [
+      "Trocea la remolacha, los tomates y el pepino pelado.",
+      "Tritura todo junto con el ajo, el aceite, el vinagre y la sal.",
+      "Añade agua fría hasta la consistencia deseada. Tritura de nuevo.",
+      "Cuela si quieres una textura más fina. Refrigera al menos 1 hora.",
+      "Sirve con un chorrito de aceite y unas semillas de sésamo si tienes."
+    ],
+    consejo: "El color es espectacular. Puedes usar remolacha ya cocida de bote para ahorrar tiempo, escúrrela bien."
+  },
+  "Croquetas de jamón caseras con tomate cherry": {
+    tiempo: "1h 30 min + reposo",
+    ingredientes: ["100g de jamón serrano picado fino", "80g de mantequilla", "120g de harina", "700ml de leche entera", "Pan rallado, 2 huevos, sal, nuez moscada, aceite para freír"],
+    pasos: [
+      "Derrite la mantequilla en una sartén. Añade el jamón y saltea 1 minuto. Incorpora la harina y cocina 2 minutos removiendo para tostarla.",
+      "Añade la leche caliente poco a poco sin parar de remover con varillas. Cocina a fuego medio 10-15 minutos hasta que la bechamel se despegue de las paredes. Salpimenta con nuez moscada.",
+      "Vierte en una fuente, tapa con papel film tocando la superficie y deja enfriar. Mete en nevera mínimo 2 horas (mejor toda la noche).",
+      "Forma las croquetas con dos cucharas o con las manos. Pasa por huevo batido y pan rallado.",
+      "Fríe en aceite abundante bien caliente hasta que estén doradas. Escurre en papel de cocina."
+    ],
+    consejo: "La masa fría es más fácil de manejar. Si se te pegan en las manos, mójatelas con agua fría."
+  },
+  "Paella de verduras con alcachofas y judías": {
+    tiempo: "45 min",
+    ingredientes: ["400g de arroz bomba", "4 alcachofas frescas", "200g de judías verdes planas", "1 tomate maduro rallado", "1 pimiento rojo", "Azafrán, pimentón dulce, aceite, sal", "1.2L de caldo de verduras caliente"],
+    pasos: [
+      "Limpia las alcachofas quitando las hojas duras hasta el corazón. Córtalas en cuartos. Trocea las judías.",
+      "Sofríe las verduras en aceite en la paella a fuego medio 10 minutos. Añade el pimiento troceado.",
+      "Añade el tomate rallado y cocina 5 minutos. Incorpora el pimentón (fuera del fuego para que no se queme) y enseguida el arroz.",
+      "Sofríe el arroz 2 minutos. Añade el caldo caliente con el azafrán disuelto. Distribuye todo bien y no remuevas más.",
+      "Cocina a fuego vivo 8 min, luego baja a fuego medio 8 min más. Deja reposar tapada con papel de aluminio 5 minutos."
+    ],
+    consejo: "El socarrat (el arroz tostado del fondo) se consigue subiendo el fuego al máximo los últimos 2 minutos. Escucha el chisporroteo."
+  },
+  "Contramuslos de pollo al ajillo": {
+    tiempo: "35 min",
+    ingredientes: ["8 contramuslos de pollo", "8 dientes de ajo", "150ml de vino blanco", "Perejil fresco", "Aceite de oliva, sal, pimienta, guindilla opcional"],
+    pasos: [
+      "Salpimienta los contramuslos. Dóralos en aceite a fuego medio-alto por todos lados hasta que estén bien dorados (unos 10 min). Retira y reserva.",
+      "En el mismo aceite, fríe los ajos laminados a fuego medio hasta que empiecen a dorarse.",
+      "Incorpora el pollo de nuevo. Añade el vino blanco y sube el fuego para que evapore el alcohol 2 minutos.",
+      "Baja el fuego, tapa y cocina 20 minutos hasta que el pollo esté tierno y la salsa reducida.",
+      "Espolvorea perejil picado antes de servir."
+    ],
+    consejo: "Los contramuslos quedan mucho más jugosos que las pechugas para este tipo de guiso. No escatimes con el ajo."
+  },
+  "Tarta de queso casera con frutos rojos": {
+    tiempo: "1h + 4h nevera",
+    ingredientes: ["400g de queso crema (Philadelphia)", "200ml de nata para montar", "3 huevos", "120g de azúcar", "20g de harina o maizena", "Frutos rojos frescos (fresas, frambuesas)"],
+    pasos: [
+      "Bate el queso crema con el azúcar hasta que esté cremoso. Añade los huevos uno a uno.",
+      "Incorpora la nata y la harina tamizada. Mezcla hasta que esté homogéneo.",
+      "Vierte en un molde de 20 cm forrado con papel de hornear.",
+      "Hornea a 200°C durante 35-40 minutos. Debe quedar dorada por fuera y ligeramente temblorosa en el centro.",
+      "Deja enfriar completamente y mete en nevera al menos 4 horas. Sirve con frutos rojos."
+    ],
+    consejo: "No te preocupes si se agrieta: es señal de que está bien hecha al estilo de La Viña. Es parte de su encanto."
+  },
+  "Crema de calabacín fría con albahaca": {
+    tiempo: "30 min + 1h frío",
+    ingredientes: ["4 calabacines medianos", "1 cebolla", "2 dientes de ajo", "200ml de nata o leche", "Caldo de verduras", "Albahaca fresca, aceite, sal"],
+    pasos: [
+      "Sofríe la cebolla y el ajo en aceite 5 minutos. Añade el calabacín troceado y cocina 10 minutos.",
+      "Cubre con caldo, lleva a ebullición y cocina 15 minutos.",
+      "Tritura con la nata y la albahaca hasta obtener una crema muy fina. Salpimenta.",
+      "Refrigera al menos 1 hora. Sirve con un chorrito de aceite y una hoja de albahaca."
+    ],
+    consejo: "Para un color verde más intenso, añade las hojas de albahaca justo antes de triturar, sin cocerlas."
+  },
+  "Albóndigas en salsa de tomate fresco": {
+    tiempo: "50 min",
+    ingredientes: ["500g de carne picada mixta (cerdo y ternera)", "1 huevo, 2 dientes de ajo, perejil, pan rallado", "700g de tomates maduros", "1 cebolla, 1 zanahoria", "Aceite, sal, azúcar, laurel"],
+    pasos: [
+      "Mezcla la carne con el huevo, ajo picado, perejil, sal y 2 cucharadas de pan rallado. Forma albóndigas del tamaño de una nuez.",
+      "Pasa las albóndigas por harina y dóralas en aceite. Reserva.",
+      "En el mismo aceite, sofríe la cebolla y la zanahoria picadas 10 min. Añade el tomate rallado, sal, azúcar y laurel. Cocina 15 min.",
+      "Incorpora las albóndigas a la salsa. Cocina 20 minutos a fuego suave hasta que estén tiernas."
+    ],
+    consejo: "Mójate las manos con agua para formar las albóndigas: evita que se peguen y quedan más redondas."
+  },
+  "Ensalada de rúcula, nueces y pera": {
+    tiempo: "10 min",
+    ingredientes: ["200g de rúcula", "2 peras conferencia", "60g de nueces", "60g de queso parmesano o manchego curado", "Aceite de oliva, vinagre balsámico, sal"],
+    pasos: [
+      "Lava y seca la rúcula. Pela y corta las peras en láminas finas.",
+      "Dispón la rúcula en la fuente. Coloca las peras encima.",
+      "Añade las nueces y el queso en lascas.",
+      "Aliña con aceite, vinagre balsámico y una pizca de sal justo antes de servir."
+    ],
+    consejo: "Si la rúcula es muy amarga, mézclala con un poco de canónigos o lechuga baby para suavizarla."
+  },
+  "Revuelto de espárragos y gambas": {
+    tiempo: "15 min",
+    ingredientes: ["6 huevos", "200g de gambas peladas", "1 manojo de espárragos trigueros", "2 dientes de ajo", "Aceite de oliva, sal, pimienta"],
+    pasos: [
+      "Corta los espárragos en trozos de 3 cm, desechando la parte dura.",
+      "Saltea los espárragos con el ajo en aceite a fuego vivo 4-5 minutos.",
+      "Añade las gambas, saltea 1-2 minutos hasta que estén rosadas.",
+      "Baja el fuego al mínimo. Añade los huevos batidos con sal y remueve suavemente hasta que cuajen cremosos. Sirve inmediatamente."
+    ],
+    consejo: "Retira del fuego cuando los huevos aún parezcan un poco líquidos: el calor residual los termina en el plato."
+  },
+  "Gazpacho de sandía": {
+    tiempo: "15 min + 1h frío",
+    ingredientes: ["600g de sandía sin pepitas", "400g de tomates maduros", "1/2 pimiento rojo", "1 diente de ajo pequeño", "50ml de aceite de oliva", "Vinagre de jerez, sal"],
+    pasos: [
+      "Trocea la sandía, los tomates y el pimiento.",
+      "Tritura todo junto con el ajo, aceite, vinagre y sal.",
+      "Cuela para eliminar impurezas. Ajusta de sal y vinagre.",
+      "Refrigera al menos 1 hora. Sirve con tropezones de sandía y un chorrito de aceite."
+    ],
+    consejo: "La sandía es dulce, así que necesitarás más vinagre que en un gazpacho normal para equilibrar."
+  },
+  "Lubina al vapor con verduras juliana": {
+    tiempo: "25 min",
+    ingredientes: ["800g de lubina (filetes o entera limpia)", "1 zanahoria, 1 puerro, 1 calabacín", "Jengibre fresco, salsa de soja suave", "Aceite de oliva, sal, limón"],
+    pasos: [
+      "Corta todas las verduras en juliana fina y alarga.",
+      "Pon las verduras en el fondo de la vaporera o cesta de bambú. Coloca la lubina encima. Salpimenta.",
+      "Cocina al vapor sobre agua hirviendo 12-15 minutos según el grosor del pescado.",
+      "Prepara una salsa mezclando aceite, unas gotas de soja, ralladura de jengibre y zumo de limón.",
+      "Sirve el pescado con las verduras y la salsa por encima."
+    ],
+    consejo: "El pescado está hecho cuando la carne se separa fácilmente en lascas al presionar con un tenedor."
+  },
+  "Arroz a la cubana con huevo frito y plátano": {
+    tiempo: "25 min",
+    ingredientes: ["320g de arroz blanco", "4 huevos", "2 plátanos maduros", "400g de tomate frito casero", "Aceite, sal"],
+    pasos: [
+      "Cuece el arroz en agua con sal según las instrucciones (unos 18 min). Escurre y reserva.",
+      "Fríe los plátanos cortados por la mitad a lo largo en aceite hasta que estén dorados.",
+      "Fríe los huevos en aceite abundante y caliente para que quede la clara cuajada y la yema líquida.",
+      "Sirve el arroz con el huevo frito encima, el plátano al lado y el tomate frito caliente."
+    ],
+    consejo: "Para el niño es un plato ideal. Puedes usar tomate frito casero que hayas preparado antes en cantidad."
+  },
+  "Chuletas de cordero a la brasa con pimientos": {
+    tiempo: "20 min",
+    ingredientes: ["12 chuletas de cordero", "3 pimientos verdes italianos", "4 dientes de ajo", "Romero fresco", "Aceite de oliva, sal gruesa, limón"],
+    pasos: [
+      "Saca el cordero de la nevera 30 minutos antes. Frota con ajo, romero y aceite.",
+      "Asa los pimientos enteros en la plancha o sartén a fuego vivo dándoles la vuelta hasta que estén blandos y con manchas negras.",
+      "Cocina las chuletas en la plancha o parrilla muy caliente 2-3 minutos por lado. Deben quedar doradas fuera y rosadas dentro.",
+      "Sirve con sal gruesa por encima y un chorrito de limón."
+    ],
+    consejo: "El cordero lechal no necesita más de 2 min por lado. Si es recental puede necesitar algo más. No las pases demasiado o quedan secas."
+  },
+  "Crema de zanahoria con jengibre": {
+    tiempo: "35 min",
+    ingredientes: ["700g de zanahorias", "1 cebolla", "1 trozo de jengibre fresco (2 cm)", "400ml de caldo de verduras", "200ml de leche de coco o nata", "Aceite, sal, cilantro o perejil"],
+    pasos: [
+      "Pela y trocea las zanahorias y la cebolla. Ralla el jengibre.",
+      "Sofríe la cebolla en aceite 5 minutos. Añade las zanahorias y el jengibre, cocina 3 minutos.",
+      "Cubre con el caldo. Cocina 25 minutos hasta que las zanahorias estén muy tiernas.",
+      "Tritura con la leche de coco hasta obtener una crema suave. Ajusta de sal.",
+      "Sirve con un chorrito de aceite y cilantro o perejil picado."
+    ],
+    consejo: "La leche de coco da cremosidad sin enmascarar el sabor. Si no tienes, usa nata o simplemente caldo."
+  },
+  "Sardinas al horno con limón y perejil": {
+    tiempo: "25 min",
+    ingredientes: ["1.2 kg de sardinas frescas (limpias)", "3 dientes de ajo", "Perejil fresco abundante", "2 limones", "Aceite de oliva, sal"],
+    pasos: [
+      "Pide en la pescadería que te limpien las sardinas por dentro. Lávalas y sécalas.",
+      "Colócalas en bandeja de horno. Salpimenta y riega con aceite.",
+      "Mezcla ajo picado, perejil picado y el zumo de 1 limón. Distribuye por encima de las sardinas.",
+      "Corta el otro limón en rodajas y colócalas entre las sardinas.",
+      "Hornea a 220°C durante 12-15 minutos."
+    ],
+    consejo: "Las sardinas de temporada de verano están en su mejor momento. En Galicia las llaman xoubas cuando son pequeñas y son deliciosas."
+  },
+  "Ensalada de garbanzos con verduras asadas": {
+    tiempo: "40 min",
+    ingredientes: ["400g de garbanzos cocidos (bote)", "1 pimiento rojo, 1 calabacín, 1 cebolla morada", "200g de tomates cherry", "Aceite, vinagre, comino, sal, perejil"],
+    pasos: [
+      "Corta el pimiento, el calabacín y la cebolla en trozos. Riega con aceite, sal y hornea a 200°C 25-30 min.",
+      "Escurre y enjuaga los garbanzos.",
+      "Mezcla garbanzos con las verduras asadas templadas y los tomates cherry partidos.",
+      "Aliña con aceite, vinagre, comino y perejil. Sirve templada o a temperatura ambiente."
+    ],
+    consejo: "Templar los garbanzos antes de mezclar hace que absorban mejor el aliño. Ponlos en el horno los últimos 5 minutos."
+  },
+  "Pollo guisado con patatas y pimientos": {
+    tiempo: "55 min",
+    ingredientes: ["1 pollo troceado (1.2 kg)", "600g de patatas", "2 pimientos (1 rojo, 1 verde)", "1 cebolla, 4 dientes de ajo", "150ml de vino blanco, tomate, pimentón, laurel, aceite, sal"],
+    pasos: [
+      "Salpimienta el pollo y dóralo bien en aceite caliente por todos lados. Retira.",
+      "En el mismo aceite, sofríe cebolla, pimientos y ajo picados 10 minutos.",
+      "Añade el tomate rallado y el pimentón. Cocina 5 min. Incorpora el pollo y el vino.",
+      "Sube el fuego 2 min para evaporar el alcohol. Añade agua hasta casi cubrir y el laurel.",
+      "Cocina 20 min. Añade las patatas en trozos y cocina 20 min más hasta que todo esté tierno."
+    ],
+    consejo: "Usa patatas que 'rompan' un poco al cocerse (Kennebec o similar) para que espesen la salsa naturalmente."
+  },
+  "Fritada de verduras con huevos pochados": {
+    tiempo: "35 min",
+    ingredientes: ["1 calabacín, 1 pimiento verde, 1 cebolla, 2 tomates", "4 huevos", "2 dientes de ajo", "Aceite de oliva, sal, pimentón, vinagre blanco"],
+    pasos: [
+      "Corta todas las verduras en trozos similares. Sofríe la cebolla y el ajo en aceite 5 min.",
+      "Añade el pimiento, el calabacín y los tomates. Salpimenta y cocina a fuego medio 20 minutos.",
+      "Para los huevos pochados: hierve agua con sal y un chorro de vinagre. Crea un remolino suave y deja caer el huevo desde un cuenco. Cocina 3 min.",
+      "Sirve la fritada con los huevos pochados encima y un toque de pimentón."
+    ],
+    consejo: "Para unos huevos pochados perfectos, usa huevos muy frescos (la clara se mantiene más unida) y no muy fríos de nevera."
+  },
+  "Sopa de fideos con almejas": {
+    tiempo: "30 min",
+    ingredientes: ["500g de almejas frescas", "150g de fideos finos (nº 2)", "1 cebolla, 2 dientes de ajo, 1 tomate", "100ml de vino blanco", "Caldo de pescado o agua, perejil, aceite, sal"],
+    pasos: [
+      "Pon las almejas en agua con sal 30 min para que suelten arena. Lávalas bien.",
+      "Sofríe la cebolla y el ajo en aceite. Añade el tomate rallado y cocina 5 min.",
+      "Añade las almejas y el vino blanco. Tapa hasta que abran. Retira las que no abran.",
+      "Añade el caldo caliente y lleva a ebullición. Incorpora los fideos y cocina según el tiempo del paquete.",
+      "Espolvorea perejil picado. Rectifica de sal."
+    ],
+    consejo: "No compres las almejas con anticipación: cuanto más frescas, mejor. Descarta cualquiera que esté abierta antes de cocinar."
+  },
+  "Bacalao al pil-pil con pimientos del piquillo": {
+    tiempo: "40 min",
+    ingredientes: ["600g de bacalao desalado en lomos", "6 dientes de ajo", "1 guindilla", "200ml de aceite de oliva suave", "Pimientos del piquillo asados"],
+    pasos: [
+      "Seca bien el bacalao. Pon el aceite con los ajos laminados y la guindilla en una cazuela de barro a fuego suave. Confita los ajos 10 min hasta que estén dorados. Retira ajos y guindilla.",
+      "Añade el bacalao con la piel hacia arriba al aceite templado. Cocina a fuego muy bajo 8-10 min sin que hierva.",
+      "Retira el bacalao. Con movimiento circular, ligea el aceite removiendo la cazuela con movimientos de vaivén para emulsionar la gelatina del bacalao con el aceite.",
+      "Añade el bacalao de nuevo a la salsa. Sirve con los pimientos del piquillo calientes al lado."
+    ],
+    consejo: "El pil-pil se consigue con movimiento constante y temperatura baja. Si la salsa no liga, enfría un poco el aceite y sigue moviendo."
+  },
+  "Pimientos asados con anchoas": {
+    tiempo: "50 min",
+    ingredientes: ["6 pimientos rojos carnosos", "12 anchoas en aceite", "3 dientes de ajo", "Aceite de oliva virgen extra, sal"],
+    pasos: [
+      "Asa los pimientos enteros en el horno a 200°C durante 40 minutos, dándoles la vuelta a mitad.",
+      "Mete los pimientos en una bolsa o bol tapado 15 min. Pélalos, retira las semillas y córtalos en tiras.",
+      "Dispón las tiras en una fuente. Coloca las anchoas por encima.",
+      "Riega con el aceite de las anchoas y añade ajo laminado. Deja macerar 15 min antes de servir."
+    ],
+    consejo: "El jugo que sueltan los pimientos al pelarlos es oro: guárdalo y úsalo como parte del aliño."
+  },
+  "Fideuà de marisco": {
+    tiempo: "40 min",
+    ingredientes: ["400g de fideos gruesos nº 4", "400g de gambas y cigalas", "300g de mejillones", "1 sepia, 1 cebolla, 2 tomates maduros", "Azafrán, pimentón, caldo de pescado, aceite, sal"],
+    pasos: [
+      "Sofríe la sepia en trozos en aceite 5 min. Añade la cebolla picada y cocina 8 min. Incorpora el tomate rallado y cocina 5 min.",
+      "Añade el pimentón (fuera del fuego) y los fideos. Sofríe los fideos 2-3 min removiendo.",
+      "Añade el caldo caliente con el azafrán (doble volumen que de fideos). Distribuye gambas, cigalas y mejillones.",
+      "Cocina a fuego vivo 5 min, luego baja 7-8 min hasta que los fideos estén hechos.",
+      "Gratina en el horno 3-4 min para que los fideos de la superficie queden levantados y crujientes. Sirve con alioli."
+    ],
+    consejo: "El caldo de pescado marca la diferencia. Si no tienes, usa las cabezas y cáscaras de las gambas para hacer un fumet express."
+  },
+  "Ensalada de langostinos y aguacate": {
+    tiempo: "20 min",
+    ingredientes: ["400g de langostinos cocidos y pelados", "2 aguacates maduros", "1 lechuga iceberg", "2 tomates", "Zumo de limón, aceite, sal, cebollino"],
+    pasos: [
+      "Pela los aguacates y córtalos en dados. Riégalos con zumo de limón para que no se oxiden.",
+      "Corta la lechuga en tiras finas y los tomates en gajos.",
+      "Mezcla todo con los langostinos.",
+      "Aliña con aceite, sal y cebollino picado. Sirve inmediatamente."
+    ],
+    consejo: "Añade el aguacate en el último momento para que no ennegrezca. Si la haces con antelación, guarda el aguacate aparte."
+  },
+  "Pulpo a la gallega con patatas cocidas": {
+    tiempo: "1h 15min",
+    ingredientes: ["1 pulpo de 1.5 kg (ya limpio, puede ser congelado)", "600g de patatas", "Pimentón dulce y picante", "Aceite de oliva virgen extra, sal gruesa"],
+    pasos: [
+      "Si el pulpo está fresco, congélalo previamente 48h para ablandar las fibras. Descongela en nevera.",
+      "Hierve agua en una olla grande. Sumerge el pulpo 3 veces brevemente antes de dejarlo cocer (para rizar los tentáculos). Cuece 45-50 min hasta que esté tierno.",
+      "Cuece las patatas en el mismo agua del pulpo durante los últimos 20 minutos.",
+      "Corta el pulpo con tijeras en rodajas. Corta las patatas en rodajas.",
+      "Sirve sobre tabla de madera: patatas, pulpo encima, sal gruesa, pimentón al gusto y un buen chorro de aceite."
+    ],
+    consejo: "En Galicia se usa pimentón de La Vera. Mezcla mitad dulce y mitad picante para un sabor auténtico."
+  },
+  "Ajoblanco malagueño con uvas": {
+    tiempo: "20 min + 1h frío",
+    ingredientes: ["200g de almendras crudas peladas", "150g de pan del día anterior", "2 dientes de ajo", "150ml de aceite de oliva suave", "3 cucharadas de vinagre de jerez", "Agua fría, sal, uvas blancas para servir"],
+    pasos: [
+      "Remoja el pan en agua 5 minutos. Escurre bien.",
+      "Tritura las almendras con el ajo hasta obtener una pasta fina.",
+      "Añade el pan escurrido, el vinagre y la sal. Tritura.",
+      "Sin parar, añade el aceite en hilo fino para emulsionar. Incorpora agua fría poco a poco hasta la consistencia deseada.",
+      "Cuela y refrigera mínimo 1 hora. Sirve con uvas peladas y sin pepitas."
+    ],
+    consejo: "Si la batidora no es muy potente, remoja las almendras en agua la noche anterior para que se trituren más fácil."
+  },
+  "Ternera estofada con zanahorias y guisantes": {
+    tiempo: "1h 30min",
+    ingredientes: ["800g de ternera para guisar (morcillo o aguja)", "3 zanahorias", "200g de guisantes frescos o congelados", "1 cebolla, 3 dientes de ajo", "150ml de vino tinto, caldo, laurel, tomillo, aceite, sal"],
+    pasos: [
+      "Corta la ternera en dados de 4 cm. Salpimenta y dora en aceite a fuego vivo. Retira.",
+      "En el mismo aceite, sofríe la cebolla y el ajo picados 8 min. Añade el vino y deja reducir 3 min.",
+      "Incorpora la carne, el caldo hasta casi cubrir, el laurel y el tomillo. Lleva a ebullición.",
+      "Baja el fuego al mínimo y cocina tapado 1 hora. Añade las zanahorias en rodajas y cocina 20 min más.",
+      "Añade los guisantes los últimos 10 minutos. Ajusta de sal."
+    ],
+    consejo: "Está mucho mejor de un día para otro. La carne habrá absorbido todos los sabores. Ideal para preparar el día anterior."
+  },
+  "Ensalada caprese con albahaca fresca": {
+    tiempo: "10 min",
+    ingredientes: ["4 tomates de rama grandes y maduros", "300g de mozarela fresca", "Albahaca fresca abundante", "Aceite de oliva virgen extra de calidad", "Sal en escamas, pimienta negra"],
+    pasos: [
+      "Corta los tomates en rodajas de 1 cm.",
+      "Corta la mozarela en rodajas similares.",
+      "Dispón alternando rodajas de tomate y mozarela en la fuente.",
+      "Coloca las hojas de albahaca fresca entre las rodajas.",
+      "Aliña con aceite de oliva generoso, sal en escamas y pimienta. Sirve inmediatamente."
+    ],
+    consejo: "Esta ensalada depende 100% de la calidad de los ingredientes. Usa el mejor aceite que tengas y tomates en su punto perfecto de madurez."
+  },
+  "Crema de puerros y patata": {
+    tiempo: "35 min",
+    ingredientes: ["4 puerros (parte blanca y verde claro)", "3 patatas medianas", "1 cebolla", "700ml de caldo de verduras", "100ml de nata, aceite, sal, cebollino"],
+    pasos: [
+      "Limpia bien los puerros y córtalos en rodajas. Pela y trocea las patatas.",
+      "Sofríe la cebolla y los puerros en aceite a fuego suave 10 min.",
+      "Añade las patatas y el caldo. Cocina 20 min hasta que todo esté tierno.",
+      "Tritura con la nata hasta obtener una crema fina. Salpimenta.",
+      "Sirve caliente o templada con cebollino picado."
+    ],
+    consejo: "Si la quieres muy fina, pásala por el chino. Para darle un toque especial, añade un poco de queso azul al triturar."
+  },
+  "Arroz con verduras al azafrán": {
+    tiempo: "30 min",
+    ingredientes: ["320g de arroz", "1 pimiento rojo, 1 calabacín, 1 zanahoria, 1 cebolla", "2 dientes de ajo", "Azafrán, caldo de verduras, aceite, sal"],
+    pasos: [
+      "Sofríe la cebolla y el ajo en aceite 5 min. Añade el pimiento y la zanahoria, cocina 5 min más.",
+      "Incorpora el calabacín y sofríe 3 min.",
+      "Añade el arroz y sofríe 2 min removiendo.",
+      "Disuelve el azafrán en el caldo caliente. Añade doble volumen de caldo que de arroz.",
+      "Cocina a fuego medio 18 min sin remover. Tapa y deja reposar 5 min."
+    ],
+    consejo: "Tuesta ligeramente el azafrán en una sartén seca 30 segundos antes de disolverlo: potencia mucho el aroma y el color."
+  },
+  "Lomo de cerdo en salsa de champiñones": {
+    tiempo: "40 min",
+    ingredientes: ["700g de lomo de cerdo en filetes gruesos", "400g de champiñones", "1 cebolla, 2 dientes de ajo", "150ml de nata, 100ml de vino blanco", "Aceite, sal, pimienta, tomillo"],
+    pasos: [
+      "Salpimienta el lomo y dóralo en aceite a fuego vivo 2-3 min por lado. Retira.",
+      "En el mismo aceite, sofríe la cebolla y el ajo 5 min. Añade los champiñones laminados y cocina hasta que evaporen el agua.",
+      "Añade el vino blanco, sube el fuego 2 min. Incorpora la nata y el tomillo.",
+      "Vuelve a poner el lomo en la sartén. Cocina a fuego suave 15 min hasta que la salsa espese.",
+      "Rectifica de sal y sirve con arroz blanco o puré."
+    ],
+    consejo: "No passes demasiado el lomo en el primer dorado: terminará de cocinarse en la salsa y quedará jugoso."
+  },
+  "Huevos a la flamenca con tomate y chorizo": {
+    tiempo: "30 min",
+    ingredientes: ["4 huevos", "400g de tomate triturado", "100g de chorizo", "1 pimiento rojo, 1 cebolla", "Guisantes, aceite, sal, pimentón"],
+    pasos: [
+      "Sofríe la cebolla y el pimiento en aceite 8 min. Añade el chorizo en rodajas y cocina 3 min.",
+      "Incorpora el tomate triturado, pimentón, sal y una pizca de azúcar. Cocina 10 min.",
+      "Pasa la salsa a cazuelas de barro individuales. Añade guisantes.",
+      "Haz un hueco y casca un huevo en cada cazuela.",
+      "Hornea a 180°C durante 8-10 min hasta que la clara esté cuajada pero la yema líquida."
+    ],
+    consejo: "Las cazuelas de barro mantienen el calor y dan un aspecto muy tradicional. Si no tienes, usa una fuente de horno."
+  },
+  "Sopa castellana con huevo y pan": {
+    tiempo: "25 min",
+    ingredientes: ["200g de pan del día anterior (mejor de pueblo)", "6 dientes de ajo", "100g de jamón o chorizo", "4 huevos", "Pimentón dulce y picante, caldo o agua, aceite, sal"],
+    pasos: [
+      "Fríe los ajos laminados en aceite hasta que estén dorados. Añade el jamón o chorizo, saltea 2 min.",
+      "Fuera del fuego, añade 1 cucharadita de pimentón. Remueve rápido.",
+      "Añade el caldo caliente y el pan en rebanadas. Lleva a ebullición y cocina 10 min.",
+      "Bate los huevos e incorpóralos removiendo para que queden en hilos (o casca los huevos enteros y deja escalfar 3 min).",
+      "Sirve inmediatamente, muy caliente."
+    ],
+    consejo: "Es un plato de invierno adaptado para cena ligera en cualquier estación. Con los huevos escalfados queda más vistoso."
+  },
+  "Rape a la marinera con almejas": {
+    tiempo: "35 min",
+    ingredientes: ["800g de rape limpio en rodajas", "400g de almejas", "1 cebolla, 3 dientes de ajo", "150ml de vino blanco, 1 tomate maduro", "Perejil, aceite, sal, azafrán"],
+    pasos: [
+      "Pon las almejas en agua con sal 30 min. Lávalas.",
+      "Salpimienta el rape y dóralo ligeramente en aceite. Retira.",
+      "Sofríe la cebolla y el ajo. Añade el tomate rallado, cocina 5 min.",
+      "Añade el vino y el azafrán. Incorpora las almejas tapadas hasta que abran.",
+      "Añade el rape y cocina a fuego suave 10 min. Espolvorea perejil abundante."
+    ],
+    consejo: "El rape es un pescado que engaña: parece duro pero se pasa fácilmente. 10 minutos son suficientes."
+  },
+  "Gazpacho de tomate amarillo": {
+    tiempo: "15 min + 1h frío",
+    ingredientes: ["1 kg de tomates amarillos maduros", "1/2 pepino", "1/4 pimiento amarillo", "1 diente de ajo", "80ml de aceite de oliva suave", "Vinagre de manzana, sal"],
+    pasos: [
+      "Trocea los tomates, el pepino pelado y el pimiento.",
+      "Tritura todo con el ajo, aceite, vinagre y sal.",
+      "Cuela para una textura fina. Ajusta de sal y vinagre.",
+      "Refrigera 1 hora mínimo. Sirve con unos dados de tomate amarillo y verde por encima."
+    ],
+    consejo: "El tomate amarillo es más suave y dulce. En verano lo encuentras en mercados y fruterías de barrio."
+  },
+  "Merluza en salsa verde con almejas": {
+    tiempo: "30 min",
+    ingredientes: ["800g de merluza en lomos", "400g de almejas", "4 dientes de ajo", "100ml de vino blanco", "Perejil abundante, harina, aceite, sal"],
+    pasos: [
+      "Pon las almejas en agua con sal 30 min. Pasa los lomos de merluza por harina, sacude el exceso.",
+      "Dora la merluza en aceite 1 min por lado. Retira.",
+      "En el mismo aceite, fríe el ajo picado. Añade el vino y el perejil picado abundante.",
+      "Incorpora las almejas tapadas hasta que abran. Añade la merluza.",
+      "Mueve la cazuela en círculos para que la salsa ligue con la gelatina del pescado. Cocina 5 min."
+    ],
+    consejo: "La harina en la merluza es lo que permite que la salsa verde ligue correctamente. No te saltes ese paso."
+  },
+  "Paella valenciana tradicional": {
+    tiempo: "50 min",
+    ingredientes: ["400g de arroz bomba", "600g de pollo y conejo troceados", "150g de judías verdes planas", "100g de garrofón o judía blanca", "1 tomate maduro rallado, azafrán, pimentón, romero", "1.2L de agua o caldo, aceite, sal"],
+    pasos: [
+      "Dora el pollo y el conejo en aceite en la paella a fuego vivo. Salpimenta.",
+      "Añade las judías y el garrofón. Sofríe 5 min. Añade el tomate y cocina 5 min.",
+      "Añade pimentón (fuera del fuego) y enseguida el agua con el azafrán. Lleva a ebullición y cocina el caldo 10 min.",
+      "Añade el arroz distribuyendo bien. Pon el romero. No remuevas más.",
+      "Cocina a fuego vivo 8 min y a fuego medio 10 min. Reposa tapada con papel de aluminio 5 min."
+    ],
+    consejo: "La paella valenciana no lleva cebolla ni pimiento. Si alguien te dice que sí, está equivocado. El secreto es el socarrat y el reposo final."
+  },
+  "Gambas al ajillo con pan de ajo": {
+    tiempo: "15 min",
+    ingredientes: ["600g de gambas peladas", "8 dientes de ajo", "2 guindillas", "150ml de aceite de oliva", "Pan de barra, mantequilla, ajo para el pan, perejil"],
+    pasos: [
+      "Prepara el pan de ajo: mezcla mantequilla blanda con ajo picado y perejil. Unta rebanadas de pan y tuéstalas en el horno 5 min a 200°C.",
+      "Calienta el aceite en cazuela de barro con los ajos laminados y las guindillas a fuego medio.",
+      "Cuando los ajos estén dorados, sube el fuego al máximo y añade las gambas.",
+      "Saltea 2-3 minutos hasta que estén rosadas. Sirve inmediatamente en la misma cazuela."
+    ],
+    consejo: "Las gambas se hacen en segundos. La cazuela debe llegar a la mesa chisporroteando. Eso es señal de que está perfecta."
+  },
+  "Crema de tomate asado con albahaca": {
+    tiempo: "50 min",
+    ingredientes: ["1 kg de tomates pera", "1 cebolla, 4 dientes de ajo", "Albahaca fresca", "Aceite de oliva, sal, azúcar, caldo de verduras"],
+    pasos: [
+      "Corta los tomates por la mitad, la cebolla en gajos y pon los ajos sin pelar. Coloca en bandeja, riega con aceite y sal.",
+      "Asa a 200°C durante 35-40 minutos hasta que estén caramelizados.",
+      "Pela los ajos asados. Tritura todo con el caldo y la albahaca. Salpimenta, añade azúcar si son muy ácidos.",
+      "Cuela para una textura fina. Sirve caliente con un chorrito de aceite y hoja de albahaca."
+    ],
+    consejo: "El asado concentra los azúcares naturales del tomate. Esta crema tiene una profundidad de sabor que el tomate crudo no puede dar."
+  },
+  "Pollo al limón con arroz blanco": {
+    tiempo: "45 min",
+    ingredientes: ["1 pollo troceado o 4 muslos", "2 limones", "4 dientes de ajo", "Romero y tomillo frescos", "320g de arroz, aceite, sal, pimienta"],
+    pasos: [
+      "Marina el pollo con zumo de 1 limón, ajo machacado, romero, tomillo, aceite, sal y pimienta. Al menos 30 min.",
+      "Dora el pollo en sartén apta para horno a fuego vivo por todos lados.",
+      "Añade rodajas del segundo limón. Hornea a 190°C durante 30 min hasta que esté dorado y cocinado.",
+      "Mientras, cuece el arroz en agua con sal 18 min. Escurre.",
+      "Sirve el pollo con el jugo de la bandeja por encima y el arroz blanco."
+    ],
+    consejo: "El zumo de limón en la marinada ablanda la carne. Añade también la ralladura para un sabor más intenso."
+  },
+  "Lentejas con chorizo y verduras": {
+    tiempo: "50 min",
+    ingredientes: ["400g de lentejas", "150g de chorizo", "1 cebolla, 2 zanahorias, 1 pimiento verde, 2 dientes de ajo", "1 hoja de laurel, pimentón, aceite, sal"],
+    pasos: [
+      "Sofríe la cebolla, el pimiento y el ajo en aceite 8 min. Añade el chorizo en rodajas y sofríe 3 min.",
+      "Incorpora las zanahorias en dados, el pimentón y las lentejas lavadas.",
+      "Cubre con agua o caldo frio (no caliente para que no se endurezcan). Añade el laurel.",
+      "Lleva a ebullición y cocina a fuego medio 30-35 min. Sal solo al final.",
+      "Rectifica de sal y sirve. Si quedan muy caldosas, sube el fuego unos minutos."
+    ],
+    consejo: "Empieza con agua fría para las lentejas, no con agua caliente. Arrancarlas en frío hace que queden más tiernas."
+  },
+  "Sopa de melón fría con jamón": {
+    tiempo: "15 min + 1h frío",
+    ingredientes: ["1 melón maduro grande", "Zumo de 1 limón", "100ml de caldo de pollo frío", "100g de jamón serrano en virutas", "Aceite de oliva, sal, menta"],
+    pasos: [
+      "Pela el melón, retira las pepitas y córtalo en trozos.",
+      "Tritura el melón con el caldo frío, el zumo de limón y una pizca de sal.",
+      "Ajusta de sal. Debe quedar fluido; añade más caldo si está muy espeso.",
+      "Refrigera 1 hora. Sirve con virutas de jamón, un chorrito de aceite y hojas de menta."
+    ],
+    consejo: "Es importante que el melón esté muy maduro y dulce. Huélelo por el extremo del pedúnculo: si huele a melón, está listo."
+  },
+  "Entrecot a la plancha con patatas al vapor": {
+    tiempo: "25 min",
+    ingredientes: ["4 entrecots de ternera (180-200g cada uno)", "600g de patatas pequeñas", "Mantequilla, romero fresco", "Aceite de oliva, sal gruesa, pimienta negra"],
+    pasos: [
+      "Cuece las patatas con piel al vapor 20 min hasta que estén tiernas. Aliña con mantequilla, romero y sal.",
+      "Saca los entrecots de la nevera 20 min antes.",
+      "Calienta la plancha al máximo. Pincela la carne con aceite, no la plancha.",
+      "Cocina 2-3 min por lado para término medio. Salpimenta al dar la vuelta, no antes.",
+      "Deja reposar la carne 3 min antes de servir. Sirve con sal gruesa por encima."
+    ],
+    consejo: "La sal antes de cocinar extrae jugos y reseca la carne. Salpimienta siempre al dar la vuelta o al final."
+  },
+  "Crema de espárragos verdes": {
+    tiempo: "30 min",
+    ingredientes: ["2 manojos de espárragos verdes", "1 puerro", "2 patatas pequeñas", "700ml de caldo de verduras", "100ml de nata, aceite, sal"],
+    pasos: [
+      "Corta las puntas de los espárragos y resérvalas para decorar. Trocea el resto desechando la parte dura.",
+      "Sofríe el puerro en aceite 5 min. Añade las patatas en dados y los espárragos.",
+      "Cubre con caldo y cocina 20 min.",
+      "Tritura con la nata hasta obtener una crema muy fina. Salpimenta.",
+      "Saltea las puntas de espárragos reservadas. Sirve la crema con las puntas y un chorrito de aceite."
+    ],
+    consejo: "Tritura bien y pasa por el chino para eliminar las fibras de los espárragos. Quedará una crema sedosa."
+  },
+  "Dorada a la espalda con ensalada de tomate": {
+    tiempo: "20 min",
+    ingredientes: ["2 doradas de 500g (abiertas en mariposa por la pescadería)", "5 dientes de ajo", "Guindilla, aceite de oliva abundante", "3 tomates maduros, sal, vinagre, orégano"],
+    pasos: [
+      "Pide en la pescadería que abran las doradas en mariposa, quitando la espina central.",
+      "Salpimienta las doradas. Cocínalas en la plancha muy caliente con la piel hacia arriba primero, 4 min. Da la vuelta, 3 min.",
+      "En una sartén, calienta aceite abundante con los ajos laminados y la guindilla hasta que los ajos estén dorados.",
+      "Vierte el aceite hirviendo sobre las doradas (ojo con las salpicaduras).",
+      "Sirve con la ensalada de tomate aliñada con aceite, sal y orégano."
+    ],
+    consejo: "El aceite hirviendo con ajo sobre el pescado es el toque que da carácter a este plato. Hazlo en la mesa para efecto dramático."
+  },
+  "Arroz caldoso con mariscos": {
+    tiempo: "45 min",
+    ingredientes: ["320g de arroz bomba", "400g de mejillones", "300g de gambas", "200g de almejas", "1 cebolla, 2 tomates, ajo, azafrán", "Caldo de pescado, aceite, sal, perejil"],
+    pasos: [
+      "Abre los mejillones al vapor. Reserva el caldo. Pela la mitad.",
+      "Sofríe la cebolla y el ajo 8 min. Añade el tomate rallado, cocina 5 min.",
+      "Añade el arroz y sofríe 2 min. Incorpora el caldo caliente con el azafrán (triple volumen que de arroz).",
+      "A los 8 min añade las gambas, las almejas y los mejillones. Cocina 10 min más.",
+      "Debe quedar caldoso (meloso). Espolvorea perejil y sirve inmediatamente."
+    ],
+    consejo: "El arroz caldoso no espera a nadie. Sírvelo en el momento en que el arroz esté en su punto o se pasa."
+  },
+  "Calamares a la romana con alioli y ensalada": {
+    tiempo: "30 min",
+    ingredientes: ["800g de calamares limpios en aros", "200g de harina, 2 huevos, agua fría con gas", "Sal, aceite de girasol para freír", "Para el alioli: 1 huevo, ajo, aceite de oliva suave, sal, limón"],
+    pasos: [
+      "Prepara el alioli: tritura el ajo con el huevo, sal y limón. Añade aceite en hilo fino hasta emulsionar. Reserva en nevera.",
+      "Prepara la tempura mezclando harina, huevos, agua con gas fría y sal. No mezcles en exceso (puede haber grumos).",
+      "Seca bien los aros de calamar con papel de cocina. Pásalos por la tempura.",
+      "Fríe en aceite abundante a 180°C en tandas pequeñas hasta que estén dorados. Escurre en papel.",
+      "Sirve inmediatamente con el alioli y ensalada verde."
+    ],
+    consejo: "El agua con gas muy fría es el secreto de una tempura crujiente. Puedes sustituir parte del agua por cerveza fría."
+  },
+  "Ceviche de gambas con aguacate": {
+    tiempo: "20 min + 30 min reposo",
+    ingredientes: ["400g de gambas peladas (crudas o cocidas)", "2 aguacates", "3 limones (zumo)", "1 lima, 1 cebolla morada", "Cilantro fresco, chile o jalapeño opcional, sal"],
+    pasos: [
+      "Si las gambas son crudas, córtalas en trozos y marina en zumo de limón 20 min (el ácido las 'cocina').",
+      "Corta la cebolla morada en juliana muy fina. Remoja en agua fría 10 min para suavizarla.",
+      "Corta los aguacates en dados. Riega con zumo de lima.",
+      "Mezcla las gambas con la cebolla, el aguacate, el cilantro y el chile si lo usas. Ajusta de sal y limón.",
+      "Sirve inmediatamente o refrigera 30 min. Acompaña con nachos o tostadas."
+    ],
+    consejo: "Al niño puedes servirle la parte sin chile aparte. El cilantro es opcional si no gusta a toda la familia."
+  },
+  "Arroz negro con sepia y alioli": {
+    tiempo: "45 min",
+    ingredientes: ["400g de arroz bomba", "600g de sepia limpia", "4 sobres de tinta de sepia", "1 cebolla, 1 pimiento verde, 3 dientes de ajo, 2 tomates", "Caldo de pescado, aceite, sal, alioli para servir"],
+    pasos: [
+      "Sofríe la sepia en trozos en aceite 5 min a fuego vivo. Retira.",
+      "Sofríe la cebolla, el pimiento y el ajo 10 min. Añade el tomate rallado, cocina 5 min.",
+      "Disuelve la tinta en un poco de caldo caliente. Añade la sepia y el arroz al sofrito, sofríe 2 min.",
+      "Añade el caldo con la tinta (doble volumen que de arroz). No remuevas.",
+      "Cocina 8 min a fuego vivo y 10 min a fuego medio. Reposa 5 min. Sirve con alioli."
+    ],
+    consejo: "La tinta de sepia la venden en sobres en la sección de pescadería. Usa 4 sobres para un color negro intenso."
+  },
+  "Lubina al horno con patatas y tomate": {
+    tiempo: "45 min",
+    ingredientes: ["1 lubina grande de 1.2 kg o 2 de 600g", "500g de patatas", "3 tomates maduros", "1 cebolla, 4 dientes de ajo", "Limón, vino blanco, aceite, sal, perejil"],
+    pasos: [
+      "Corta las patatas en rodajas finas. Colócalas como base en la fuente de horno. Salpimenta.",
+      "Añade la cebolla en juliana y los tomates en rodajas por encima.",
+      "Coloca la lubina encima. Rellena el interior con ajo, perejil y rodajas de limón.",
+      "Vierte el vino blanco y riega todo con aceite. Salpimenta.",
+      "Hornea a 200°C durante 25-30 min según el tamaño."
+    ],
+    consejo: "Para saber si el pescado está listo, mete un palillo en la parte más gruesa: si sale caliente y la carne se separa fácil, está perfecto."
+  },
+  "Bizcocho de limón casero con nata": {
+    tiempo: "50 min",
+    ingredientes: ["3 huevos", "200g de azúcar", "120ml de aceite de girasol", "Ralladura y zumo de 2 limones", "240g de harina", "1 sobre de levadura química", "200ml de nata para montar"],
+    pasos: [
+      "Bate los huevos con el azúcar hasta que blanqueen. Añade el aceite, la ralladura y el zumo de limón.",
+      "Tamiza la harina con la levadura e incorpórala poco a poco con movimientos envolventes.",
+      "Vierte en molde de 24 cm engrasado y enharinado.",
+      "Hornea a 175°C durante 35-40 min. Comprueba con palillo: debe salir limpio.",
+      "Deja enfriar. Monta la nata bien fría con azúcar al gusto. Sirve el bizcocho con la nata montada."
+    ],
+    consejo: "Si usas el vaso del yogur como medida (1 vaso = 1 yogur natural), sale un bizcocho perfecto: 1 de aceite, 2 de azúcar, 3 de harina, 3 huevos."
+  },
+  "Ensalada griega con feta": {
+    tiempo: "10 min",
+    ingredientes: ["3 tomates grandes", "1 pepino", "1 pimiento verde", "1/2 cebolla morada", "150g de queso feta", "Aceitunas negras", "Aceite de oliva, orégano, sal"],
+    pasos: [
+      "Corta los tomates en gajos, el pepino en rodajas gruesas, el pimiento en tiras y la cebolla en aros.",
+      "Dispón todo en la fuente. Añade las aceitunas negras.",
+      "Coloca el feta encima en un bloque o desmenuzado.",
+      "Aliña generosamente con aceite, orégano y sal. No mezcles hasta servir."
+    ],
+    consejo: "La ensalada griega auténtica no lleva lechuga. El feta va en un bloque encima, no mezclado: cada comensal lo desmenúza a su gusto."
+  },
+  "Boquerones en vinagre con pan tostado": {
+    tiempo: "10 min + 12h marinado",
+    ingredientes: ["400g de boquerones frescos (limpios, sin espina)", "Vinagre de vino blanco", "3 dientes de ajo", "Perejil fresco, aceite de oliva, sal"],
+    pasos: [
+      "Pide en la pescadería que te limpien los boquerones abiertos en libro sin espina.",
+      "Cubre los boquerones con vinagre blanco. Deja marinar en nevera 12 horas (se pondrán blancos).",
+      "Escurre el vinagre. Cubre con aceite de oliva, ajo picado y perejil.",
+      "Deja reposar 30 min más en nevera.",
+      "Sirve sobre rebanadas de pan tostado."
+    ],
+    consejo: "Por seguridad alimentaria, congela los boquerones frescos 48h antes del marinado para eliminar el anisakis."
+  },
+  "Tarta de queso con mermelada de frutos rojos": {
+    tiempo: "1h + 4h nevera",
+    ingredientes: ["400g de queso crema", "200ml de nata", "3 huevos", "120g de azúcar", "20g de maizena", "Para la mermelada: 300g de frutos rojos frescos o congelados, 100g de azúcar"],
+    pasos: [
+      "Prepara la mermelada: cuece los frutos rojos con el azúcar a fuego medio 20 min removiendo. Deja enfriar.",
+      "Bate el queso con el azúcar. Añade los huevos uno a uno, la nata y la maizena.",
+      "Vierte en molde forrado con papel y hornea a 200°C 35-40 min.",
+      "Deja enfriar completamente antes de meter en nevera mínimo 4 horas.",
+      "Sirve con la mermelada de frutos rojos por encima."
+    ],
+    consejo: "Si la mermelada queda muy líquida, añade una cucharadita de maizena disuelta y cocina 5 minutos más removiendo."
+  }
+};
+
+const weeks = [
+  { label: "Semana 1", days: [
+    { day: "Lunes", color: "lunes", comida: { primero: "Gazpacho andaluz con tropezones", segundo: "Merluza al horno con patatas panaderas", postre: "Melón fresco" }, cena: { primero: "Ensalada de tomate y pepino con orégano", segundo: "Tortilla española con pimientos asados", postre: "Yogur natural con miel" } },
+    { day: "Martes", color: "martes", comida: { primero: "Crema fría de pepino y menta", segundo: "Pollo a la plancha con judías verdes salteadas", postre: "Fresas con zumo de naranja" }, cena: { primero: "Pisto manchego", segundo: "Huevos revueltos con champiñones", postre: "Sandía fresca" } },
+    { day: "Miércoles", color: "miercoles", comida: { primero: "Ensaladilla rusa casera", segundo: "Solomillo de cerdo a la plancha con escalivada", postre: "Melocotón en almíbar casero" }, cena: { primero: "Caldo de verduras ligero", segundo: "Bonito encebollado con tomate", postre: "Queso fresco con membrillo" } },
+    { day: "Jueves", color: "jueves", comida: { primero: "Salmorejo cordobés con jamón y huevo duro", segundo: "Lentejas estofadas con verduras de verano", postre: "Nectarinas frescas" }, cena: { primero: "Ensalada mixta con atún y maíz", segundo: "Pizza casera de verduras", postre: "Kéfir natural" } },
+    { day: "Viernes", color: "viernes", comida: { primero: "Vichyssoise fría", segundo: "Dorada a la sal con ensalada verde", postre: "Helado artesanal de limón" }, cena: { primero: "Gazpacho de remolacha", segundo: "Croquetas de jamón caseras con tomate cherry", postre: "Macedonia de frutas de temporada" } },
+    { day: "Sábado", color: "sabado", comida: { primero: "Paella de verduras con alcachofas y judías", segundo: "Contramuslos de pollo al ajillo", postre: "Tarta de queso casera con frutos rojos" }, cena: { primero: "Pan con tomate y aceite de oliva", segundo: "Tabla de embutidos, quesos y pimientos del piquillo", postre: "Helado de vainilla con fresas" } }
+  ]},
+  { label: "Semana 2", days: [
+    { day: "Lunes", color: "lunes", comida: { primero: "Crema de calabacín fría con albahaca", segundo: "Albóndigas en salsa de tomate fresco", postre: "Ciruelas de temporada" }, cena: { primero: "Ensalada de rúcula, nueces y pera", segundo: "Revuelto de espárragos y gambas", postre: "Yogur griego con miel" } },
+    { day: "Martes", color: "martes", comida: { primero: "Gazpacho de sandía", segundo: "Lubina al vapor con verduras juliana", postre: "Higos frescos" }, cena: { primero: "Sopa fría de tomate y albahaca", segundo: "Tortilla de patata al gusto con alioli", postre: "Sandía con menta" } },
+    { day: "Miércoles", color: "miercoles", comida: { primero: "Arroz a la cubana con huevo frito y plátano", segundo: "Chuletas de cordero a la brasa con pimientos", postre: "Melocotón fresco" }, cena: { primero: "Crema de zanahoria con jengibre", segundo: "Sardinas al horno con limón y perejil", postre: "Queso fresco con tomate" } },
+    { day: "Jueves", color: "jueves", comida: { primero: "Ensalada de garbanzos con verduras asadas", segundo: "Pollo guisado con patatas y pimientos", postre: "Brevas con requesón" }, cena: { primero: "Gazpacho clásico", segundo: "Fritada de verduras con huevos pochados", postre: "Helado de chocolate" } },
+    { day: "Viernes", color: "viernes", comida: { primero: "Sopa de fideos con almejas", segundo: "Bacalao al pil-pil con pimientos del piquillo", postre: "Tarta de frutas casera" }, cena: { primero: "Pimientos asados con anchoas", segundo: "Bocadillos de lomo con queso a la plancha", postre: "Yogur con frutos del bosque" } },
+    { day: "Sábado", color: "sabado", comida: { primero: "Fideuà de marisco", segundo: "Ensalada de langostinos y aguacate", postre: "Helado de turrón con almendras" }, cena: { primero: "Crostini con tomate y anchoa", segundo: "Pulpo a la gallega con patatas cocidas", postre: "Melocotón asado con canela" } }
+  ]},
+  { label: "Semana 3", days: [
+    { day: "Lunes", color: "lunes", comida: { primero: "Ajoblanco malagueño con uvas", segundo: "Ternera estofada con zanahorias y guisantes", postre: "Melón con jamón" }, cena: { primero: "Ensalada caprese con albahaca fresca", segundo: "Tortilla de espinacas y queso", postre: "Kiwi fresco" } },
+    { day: "Martes", color: "martes", comida: { primero: "Crema de puerros y patata", segundo: "Pechuga de pavo a la plancha con ensalada de tomate", postre: "Uvas de temporada" }, cena: { primero: "Gazpacho de pepino", segundo: "Patatas bravas caseras con alioli", postre: "Requesón con miel y nueces" } },
+    { day: "Miércoles", color: "miercoles", comida: { primero: "Arroz con verduras al azafrán", segundo: "Lomo de cerdo en salsa de champiñones", postre: "Nectarinas frescas" }, cena: { primero: "Ensalada de pasta con atún y aceitunas", segundo: "Huevos a la flamenca con tomate y chorizo", postre: "Sandía fría" } },
+    { day: "Jueves", color: "jueves", comida: { primero: "Sopa castellana con huevo y pan", segundo: "Rape a la marinera con almejas", postre: "Ciruelas y albaricoques" }, cena: { primero: "Crema de aguacate con cebollino", segundo: "Bocadillo de pollo asado con lechuga", postre: "Yogur con granola casera" } },
+    { day: "Viernes", color: "viernes", comida: { primero: "Gazpacho de tomate amarillo", segundo: "Merluza en salsa verde con almejas", postre: "Helado de fresa artesanal" }, cena: { primero: "Ensaladilla de pulpo con pimentón", segundo: "Croquetas de bacalao caseras", postre: "Fruta de temporada variada" } },
+    { day: "Sábado", color: "sabado", comida: { primero: "Paella valenciana tradicional", segundo: "Ensalada de pimientos asados con boquerones", postre: "Tarta de Santiago" }, cena: { primero: "Pan tumaca con queso manchego", segundo: "Gambas al ajillo con pan de ajo", postre: "Helado de limón con galleta" } }
+  ]},
+  { label: "Semana 4", days: [
+    { day: "Lunes", color: "lunes", comida: { primero: "Crema de tomate asado con albahaca", segundo: "Pollo al limón con arroz blanco", postre: "Melón fresco" }, cena: { primero: "Ensalada de judías verdes con vinagreta de mostaza", segundo: "Revuelto de tomate y pimientos con jamón", postre: "Yogur natural" } },
+    { day: "Martes", color: "martes", comida: { primero: "Gazpacho clásico", segundo: "Lentejas con chorizo y verduras", postre: "Ciruelas frescas" }, cena: { primero: "Ensalada griega con feta", segundo: "Tortilla francesa con espárragos y queso", postre: "Sandía con menta" } },
+    { day: "Miércoles", color: "miercoles", comida: { primero: "Sopa de melón fría con jamón", segundo: "Entrecot a la plancha con patatas al vapor", postre: "Melocotón y frambuesas" }, cena: { primero: "Pisto manchego", segundo: "Boquerones en vinagre con pan tostado", postre: "Queso fresco con membrillo" } },
+    { day: "Jueves", color: "jueves", comida: { primero: "Crema de espárragos verdes", segundo: "Dorada a la espalda con ensalada de tomate", postre: "Higos con requesón" }, cena: { primero: "Salmorejo cordobés con jamón y huevo duro", segundo: "Pizza casera de jamón y queso", postre: "Macedonia con zumo de naranja" } },
+    { day: "Viernes", color: "viernes", comida: { primero: "Arroz caldoso con mariscos", segundo: "Calamares a la romana con alioli y ensalada", postre: "Tarta de queso con mermelada de frutos rojos" }, cena: { primero: "Ceviche de gambas con aguacate", segundo: "Croquetas de jamón caseras con tomate cherry", postre: "Helado de vainilla" } },
+    { day: "Sábado", color: "sabado", comida: { primero: "Arroz negro con sepia y alioli", segundo: "Lubina al horno con patatas y tomate", postre: "Bizcocho de limón casero con nata" }, cena: { primero: "Pimientos asados con anchoas", segundo: "Tabla de embutidos, quesos y pimientos del piquillo", postre: "Frutas de temporada con helado" } }
+  ]}
+];
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let state = { week: 0, dayIdx: null, view: 'grid', modal: null };
+
+function render() {
+  document.getElementById('app').innerHTML = buildApp();
+  bindEvents();
+}
+
+// ═══════════════════════════════════════════════════════
+//  BUILD HTML
+// ═══════════════════════════════════════════════════════
+function buildApp() {
+  return `
+    <div class="header">
+      <div class="header-eyebrow">Menú de temporada · Verano</div>
+      <h1>Mesa Familiar</h1>
+      <div class="header-sub">4 personas · 3 adultos + 1 niño · Lunes a Sábado</div>
+      <div class="header-hint">Toca un plato para ver su receta 📖</div>
+    </div>
+    ${buildTabs()}
+    ${state.view === 'grid' ? buildGrid() : buildDetail()}
+    <div class="footer">Cocina de mercado · Productos frescos · Sin preparados industriales</div>
+    ${state.modal ? buildModal() : ''}
+  `;
+}
+
+function buildTabs() {
+  return `<div class="week-tabs">
+    ${weeks.map((w,i) => `<button class="week-tab ${i===state.week?'active':''}" data-week="${i}">${w.label}</button>`).join('')}
+  </div>`;
+}
+
+function buildGrid() {
+  const days = weeks[state.week].days;
+  return `<div class="grid">
+    ${days.map((d,i) => `
+      <button class="day-card" data-day="${i}" style="border-color:var(--${d.color})22">
+        <span class="day-badge" style="background:var(--${d.color})">${d.day}</span>
+        <div class="card-label">Comida</div>
+        <div class="card-dish">${d.comida.primero}</div>
+        <div class="card-label">Cena</div>
+        <div class="card-dish">${d.cena.primero}</div>
+        <div class="card-arrow" style="color:var(--${d.color})">Ver menú completo →</div>
+      </button>`).join('')}
+  </div>`;
+}
+
+function buildDetail() {
+  const d = weeks[state.week].days[state.dayIdx];
+  const prev = state.dayIdx > 0 ? weeks[state.week].days[state.dayIdx-1].day : null;
+  const next = state.dayIdx < 5 ? weeks[state.week].days[state.dayIdx+1].day : null;
+  return `<div class="detail">
+    <button class="back-btn" id="backBtn">← Volver</button>
+    <div><span class="day-title-badge" style="background:var(--${d.color})">${d.day} · ${weeks[state.week].label}</span></div>
+    <div class="detail-hint">👆 Toca un plato para ver su receta paso a paso</div>
+    ${buildMealBlock('🍽️ COMIDA', d.comida, '#F0F8EC')}
+    ${buildMealBlock('🌙 CENA', d.cena, '#EDF2F8')}
+    <div class="day-nav">
+      ${prev ? `<button class="day-nav-btn" id="prevDay">← ${prev}</button>` : ''}
+      ${next ? `<button class="day-nav-btn" id="nextDay">${next} →</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function buildMealBlock(label, meal, bg) {
+  const dishes = [
+    { role: 'Primer plato', name: meal.primero, emoji: '🥗' },
+    { role: 'Segundo plato', name: meal.segundo, emoji: '🍳' },
+    { role: 'Postre', name: meal.postre, emoji: '🍑' }
+  ];
+  return `<div class="meal-block" style="background:${bg}">
+    <div class="meal-block-label">${label}</div>
+    ${dishes.map(dish => `
+      <button class="dish-btn" data-dish="${encodeURIComponent(dish.name)}">
+        <span class="dish-emoji">${dish.emoji}</span>
+        <div class="dish-info">
+          <div class="dish-role">${dish.role}</div>
+          <div class="dish-name">${dish.name}</div>
+        </div>
+        <span class="dish-icon">📖</span>
+      </button>`).join('')}
+  </div>`;
+}
+
+function buildModal() {
+  const dish = state.modal;
+  const recipe = RECETAS[dish];
+  return `<div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal-sheet">
+      <div class="modal-handle-wrap"><div class="modal-handle"></div></div>
+      <div class="modal-eyebrow">Receta · 4 personas</div>
+      <div class="modal-title">${dish}</div>
+      ${recipe ? `
+        <div class="modal-time">⏱ ${recipe.tiempo}</div>
+        <div class="section-label">🛒 Ingredientes</div>
+        <div class="ingredient-list">
+          ${recipe.ingredientes.map(i => `<div class="ingredient-item"><span class="ingredient-dot">·</span>${i}</div>`).join('')}
+        </div>
+        <div class="section-label">📋 Elaboración</div>
+        <div class="steps-list">
+          ${recipe.pasos.map((p,i) => `<div class="step-item"><span class="step-num">${i+1}</span><div class="step-text">${p}</div></div>`).join('')}
+        </div>
+        ${recipe.consejo ? `<div class="tip-box"><div class="tip-label">💡 Consejo</div><div class="tip-text">${recipe.consejo}</div></div>` : ''}
+      ` : `<div style="padding:30px 0;text-align:center;font-family:sans-serif;color:var(--muted)">Sirve este plato con los ingredientes frescos que prefieras 🌿</div>`}
+      <button class="modal-close" id="modalClose">Cerrar</button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  EVENTS
+// ═══════════════════════════════════════════════════════
+function bindEvents() {
+  // Week tabs
+  document.querySelectorAll('.week-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.week = +btn.dataset.week;
+      state.view = 'grid';
+      state.dayIdx = null;
+      render();
+    });
+  });
+
+  // Day cards
+  document.querySelectorAll('.day-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.dayIdx = +btn.dataset.day;
+      state.view = 'detail';
+      render();
+      window.scrollTo(0,0);
+    });
+  });
+
+  // Back button
+  const back = document.getElementById('backBtn');
+  if (back) back.addEventListener('click', () => { state.view = 'grid'; state.dayIdx = null; render(); window.scrollTo(0,0); });
+
+  // Day nav
+  const prev = document.getElementById('prevDay');
+  if (prev) prev.addEventListener('click', () => { state.dayIdx--; render(); window.scrollTo(0,0); });
+  const next = document.getElementById('nextDay');
+  if (next) next.addEventListener('click', () => { state.dayIdx++; render(); window.scrollTo(0,0); });
+
+  // Dish buttons
+  document.querySelectorAll('.dish-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.modal = decodeURIComponent(btn.dataset.dish);
+      render();
+    });
+  });
+
+  // Modal close
+  const modalClose = document.getElementById('modalClose');
+  if (modalClose) modalClose.addEventListener('click', () => { state.modal = null; render(); });
+  const backdrop = document.getElementById('modalBackdrop');
+  if (backdrop) backdrop.addEventListener('click', e => { if (e.target === backdrop) { state.modal = null; render(); } });
+}
+
+// ═══════════════════════════════════════════════════════
+//  SERVICE WORKER
+// ═══════════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
