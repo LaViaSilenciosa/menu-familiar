@@ -137,6 +137,17 @@
     .loading-box { text-align: center; padding: 50px 0; font-family: sans-serif; color: var(--muted); }
     .loading-emoji { font-size: 30px; margin-bottom: 10px; }
 
+    /* ── CARD IMAGE ── */
+    .card-img-wrap { width: 100%; height: 90px; border-radius: 8px; overflow: hidden; margin-bottom: 10px; background: #EDE8DF; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .3s; }
+    .card-img.loading { opacity: 0; }
+
+    /* ── MODAL IMAGE ── */
+    .modal-img-wrap { width: calc(100% + 40px); margin: 0 -20px 20px; height: 220px; overflow: hidden; background: #EDE8DF; position: relative; }
+    .modal-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .4s; }
+    .modal-img.loading { opacity: 0; }
+    .modal-img-credit { position: absolute; bottom: 6px; right: 8px; font-family: sans-serif; font-size: 9px; color: rgba(255,255,255,.7); background: rgba(0,0,0,.35); padding: 2px 6px; border-radius: 4px; }
+
     /* ── FOOTER ── */
     .footer { text-align: center; padding: 22px 16px; font-family: sans-serif; font-size: 10px; color: #B0A080; border-top: 1px solid #E8DEC8; margin-top: 10px; }
   </style>
@@ -1016,6 +1027,126 @@ const weeks = [
 ];
 
 // ═══════════════════════════════════════════════════════
+//  IMÁGENES — búsqueda por plato (Unsplash Source)
+// ═══════════════════════════════════════════════════════
+// Unsplash Source API: https://source.unsplash.com/featured/?{query}
+// No requiere API key, es pública y gratuita.
+const DISH_QUERIES = {
+  "Gazpacho andaluz con tropezones": "gazpacho spanish soup",
+  "Merluza al horno con patatas panaderas": "baked fish potatoes oven",
+  "Ensalada de tomate y pepino con orégano": "tomato cucumber salad",
+  "Tortilla española con pimientos asados": "spanish omelette tortilla",
+  "Crema fría de pepino y menta": "cold cucumber cream soup",
+  "Pollo a la plancha con judías verdes salteadas": "grilled chicken green beans",
+  "Pisto manchego": "spanish ratatouille vegetables",
+  "Huevos revueltos con champiñones": "scrambled eggs mushrooms",
+  "Ensaladilla rusa casera": "russian salad potato salad",
+  "Solomillo de cerdo a la plancha con escalivada": "pork tenderloin roasted vegetables",
+  "Melocotón en almíbar casero": "peaches syrup dessert",
+  "Caldo de verduras ligero": "vegetable broth soup bowl",
+  "Bonito encebollado con tomate": "tuna onion tomato spanish",
+  "Salmorejo cordobés con jamón y huevo duro": "salmorejo spanish cold soup",
+  "Lentejas estofadas con verduras de verano": "lentil stew vegetables",
+  "Ensalada mixta con atún y maíz": "mixed salad tuna corn",
+  "Pizza casera de verduras": "homemade vegetable pizza",
+  "Vichyssoise fría": "vichyssoise cold leek soup",
+  "Dorada a la sal con ensalada verde": "sea bream salt baked fish",
+  "Gazpacho de remolacha": "beetroot cold soup gazpacho",
+  "Croquetas de jamón caseras con tomate cherry": "croquettes ham spanish",
+  "Macedonia de frutas de temporada": "fruit salad summer bowl",
+  "Paella de verduras con alcachofas y judías": "vegetable paella rice spanish",
+  "Contramuslos de pollo al ajillo": "chicken garlic spanish cazuela",
+  "Tarta de queso casera con frutos rojos": "cheesecake red berries",
+  "Pan con tomate y aceite de oliva": "pan con tomate bread tomato",
+  "Tabla de embutidos, quesos y pimientos del piquillo": "charcuterie cheese board",
+  "Crema de calabacín fría con albahaca": "zucchini cream soup basil",
+  "Albóndigas en salsa de tomate fresco": "meatballs tomato sauce",
+  "Ensalada de rúcula, nueces y pera": "arugula walnut pear salad",
+  "Revuelto de espárragos y gambas": "scrambled eggs asparagus shrimp",
+  "Gazpacho de sandía": "watermelon gazpacho cold soup",
+  "Lubina al vapor con verduras juliana": "steamed sea bass fish vegetables",
+  "Arroz a la cubana con huevo frito y plátano": "rice fried egg banana cuban",
+  "Chuletas de cordero a la brasa con pimientos": "lamb chops grilled peppers",
+  "Crema de zanahoria con jengibre": "carrot ginger cream soup",
+  "Sardinas al horno con limón y perejil": "sardines baked lemon parsley",
+  "Ensalada de garbanzos con verduras asadas": "chickpea salad roasted vegetables",
+  "Pollo guisado con patatas y pimientos": "chicken stew potatoes peppers",
+  "Fritada de verduras con huevos pochados": "vegetable stew poached eggs",
+  "Sopa de fideos con almejas": "noodle soup clams seafood",
+  "Bacalao al pil-pil con pimientos del piquillo": "salt cod pil pil basque",
+  "Pimientos asados con anchoas": "roasted peppers anchovies",
+  "Bocadillos de lomo con queso a la plancha": "pork loin sandwich grilled cheese",
+  "Fideuà de marisco": "fideuà seafood noodle paella",
+  "Ensalada de langostinos y aguacate": "prawn avocado salad",
+  "Pulpo a la gallega con patatas cocidas": "octopus galician potatoes paprika",
+  "Melocotón asado con canela": "roasted peach cinnamon dessert",
+  "Ajoblanco malagueño con uvas": "ajoblanco almond cold soup grapes",
+  "Ternera estofada con zanahorias y guisantes": "beef stew carrots peas",
+  "Ensalada caprese con albahaca fresca": "caprese salad mozzarella tomato basil",
+  "Tortilla de espinacas y queso": "spinach cheese omelette",
+  "Crema de puerros y patata": "leek potato cream soup",
+  "Pechuga de pavo a la plancha con ensalada de tomate": "turkey breast grilled tomato salad",
+  "Arroz con verduras al azafrán": "saffron rice vegetables",
+  "Lomo de cerdo en salsa de champiñones": "pork loin mushroom sauce",
+  "Ensalada de pasta con atún y aceitunas": "pasta salad tuna olives",
+  "Huevos a la flamenca con tomate y chorizo": "huevos flamencos eggs tomato chorizo",
+  "Sopa castellana con huevo y pan": "castilian garlic soup bread egg",
+  "Rape a la marinera con almejas": "monkfish clams marinera sauce",
+  "Crema de aguacate con cebollino": "avocado cream soup chives",
+  "Bocadillo de pollo asado con lechuga": "roasted chicken sandwich lettuce",
+  "Gazpacho de tomate amarillo": "yellow tomato gazpacho cold soup",
+  "Merluza en salsa verde con almejas": "hake clams green sauce",
+  "Ensaladilla de pulpo con pimentón": "octopus salad paprika",
+  "Croquetas de bacalao caseras": "cod croquettes spanish",
+  "Paella valenciana tradicional": "paella valenciana traditional",
+  "Ensalada de pimientos asados con boquerones": "roasted peppers anchovies salad",
+  "Tarta de Santiago": "tarta de santiago almond cake",
+  "Pan tumaca con queso manchego": "pan tumaca bread tomato manchego",
+  "Gambas al ajillo con pan de ajo": "garlic prawns shrimp spanish cazuela",
+  "Crema de tomate asado con albahaca": "roasted tomato soup basil cream",
+  "Pollo al limón con arroz blanco": "lemon chicken white rice",
+  "Ensalada de judías verdes con vinagreta de mostaza": "green bean salad mustard vinaigrette",
+  "Revuelto de tomate y pimientos con jamón": "scrambled eggs tomato peppers ham",
+  "Gazpacho clásico": "gazpacho andaluz classic cold soup",
+  "Lentejas con chorizo y verduras": "lentils chorizo stew",
+  "Ensalada griega con feta": "greek salad feta cheese",
+  "Tortilla francesa con espárragos y queso": "french omelette asparagus cheese",
+  "Sopa de melón fría con jamón": "melon cold soup ham",
+  "Entrecot a la plancha con patatas al vapor": "entrecote grilled steak potatoes",
+  "Pisto con huevo": "ratatouille egg vegetables spanish",
+  "Boquerones en vinagre con pan tostado": "anchovies vinegar toast",
+  "Crema de espárragos verdes": "green asparagus cream soup",
+  "Dorada a la espalda con ensalada de tomate": "sea bream grilled fish tomato",
+  "Salmorejo con viruta de jamón": "salmorejo ham serrano",
+  "Pizza casera de jamón y queso": "ham cheese homemade pizza",
+  "Arroz caldoso con mariscos": "seafood rice broth spanish",
+  "Calamares a la romana con alioli y ensalada": "calamari rings fried aioli",
+  "Tarta de queso con mermelada de frutos rojos": "cheesecake berry jam",
+  "Ceviche de gambas con aguacate": "shrimp ceviche avocado",
+  "Croquetas de jamón con ensalada verde": "ham croquettes green salad",
+  "Arroz negro con sepia y alioli": "black rice squid ink aioli",
+  "Lubina al horno con patatas y tomate": "sea bass baked potatoes tomato",
+  "Bizcocho de limón casero con nata": "lemon cake cream homemade",
+  "Anchoas del Cantábrico con pimientos del piquillo": "cantabrian anchovies piquillo peppers",
+  "Frutas de temporada con helado": "summer fruit ice cream dessert",
+  "Helado de vainilla con fresas": "vanilla ice cream strawberries",
+  "Helado artesanal de limón": "lemon sorbet ice cream",
+  "Tarta de frutas casera": "fruit tart homemade pastry",
+  "Helado de turrón con almendras": "nougat ice cream almonds",
+  "Helado de chocolate": "chocolate ice cream dessert",
+  "Helado de fresa artesanal": "strawberry ice cream artisan",
+  "Helado de limón con galleta": "lemon ice cream cookie",
+  "Helado de vainilla": "vanilla ice cream scoop"
+};
+
+function dishImgUrl(dishName, w, h) {
+  const q = DISH_QUERIES[dishName] || dishName.split(' ').slice(0,3).join(' ');
+  // Usamos un seed basado en el nombre para que siempre salga la misma foto
+  const seed = dishName.length * 7 + dishName.charCodeAt(0);
+  return `https://source.unsplash.com/${w}x${h}/?${encodeURIComponent(q)}&sig=${seed}`;
+}
+
+// ═══════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════
 let state = { week: 0, dayIdx: null, view: 'grid', modal: null };
@@ -1052,15 +1183,25 @@ function buildTabs() {
 function buildGrid() {
   const days = weeks[state.week].days;
   return `<div class="grid">
-    ${days.map((d,i) => `
-      <button class="day-card" data-day="${i}" style="border-color:var(--${d.color})22">
-        <span class="day-badge" style="background:var(--${d.color})">${d.day}</span>
-        <div class="card-label">Comida</div>
-        <div class="card-dish">${d.comida.primero}</div>
-        <div class="card-label">Cena</div>
-        <div class="card-dish">${d.cena.primero}</div>
-        <div class="card-arrow" style="color:var(--${d.color})">Ver menú completo →</div>
-      </button>`).join('')}
+    ${days.map((d,i) => {
+      const imgUrl = dishImgUrl(d.comida.primero, 320, 180);
+      return `
+      <button class="day-card" data-day="${i}" style="border-color:var(--${d.color})22; padding:0; overflow:hidden;">
+        <div class="card-img-wrap" style="margin:0; border-radius:10px 10px 0 0;">
+          <img class="card-img loading" src="${imgUrl}" alt="${d.comida.primero}"
+            onload="this.classList.remove('loading')"
+            onerror="this.parentElement.style.display='none'">
+        </div>
+        <div style="padding:12px 12px 10px">
+          <span class="day-badge" style="background:var(--${d.color})">${d.day}</span>
+          <div class="card-label">Comida</div>
+          <div class="card-dish">${d.comida.primero}</div>
+          <div class="card-label">Cena</div>
+          <div class="card-dish">${d.cena.primero}</div>
+          <div class="card-arrow" style="color:var(--${d.color})">Ver menú completo →</div>
+        </div>
+      </button>`;
+    }).join('')}
   </div>`;
 }
 
@@ -1104,9 +1245,16 @@ function buildMealBlock(label, meal, bg) {
 function buildModal() {
   const dish = state.modal;
   const recipe = RECETAS[dish];
+  const imgUrl = dishImgUrl(dish, 800, 440);
   return `<div class="modal-backdrop" id="modalBackdrop">
     <div class="modal-sheet">
       <div class="modal-handle-wrap"><div class="modal-handle"></div></div>
+      <div class="modal-img-wrap">
+        <img class="modal-img loading" src="${imgUrl}" alt="${dish}"
+          onload="this.classList.remove('loading')"
+          onerror="this.parentElement.style.display='none'">
+        <div class="modal-img-credit">Unsplash</div>
+      </div>
       <div class="modal-eyebrow">Receta · 4 personas</div>
       <div class="modal-title">${dish}</div>
       ${recipe ? `
